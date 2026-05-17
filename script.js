@@ -845,11 +845,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      alert("Check your email to verify account");
+      alert("Account created successfully! Redirecting...");
 
       hcaptcha.reset();
       btn.textContent = "Create Account";
       btn.disabled = false;
+      
+      // Forces the page to switch to the dashboard immediately
+      window.location.href = 'dashboard.html';
     });
   }
 });

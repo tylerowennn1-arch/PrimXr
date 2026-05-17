@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Register — PrimXcapital</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-page">
+  <div class="auth__bg"></div>
+  <div class="auth__particles" id="particles"></div>
+  <div class="auth__container">
+    <a href="index.html" class="auth__logo">
+      <img src="logo.jpg" alt="PrimXCapital Logo" class="nav__logo-image">
+      <span>Prim<span class="auth__logo-accent">X</span>capital</span>
+    </a>
+    <div class="auth__card fade-in visible">
+      <h1 class="auth__title" data-i18n="register_title">Create Account</h1>
+      <p class="auth__subtitle" data-i18n="register_subtitle">Start your investment journey today</p>
+      <form class="auth__form" id="registerForm">
+        <div class="auth__field">
+          <label for="regName" data-i18n="register_name">Full Name</label>
+          <input type="text" id="regName" name="full_name" placeholder=" " required>
+        </div>
+
+        <div class="auth__field">
+          <label for="regEmail" data-i18n="register_email">Email Address</label>
+          <input type="email" id="regEmail" name="email" placeholder="you@example.com" required>
+        </div>
+
+        <div class="auth__field">
+          <label for="regPassword" data-i18n="register_password">Password</label>
+          <div class="auth__password-wrapper">
+            <input type="password" id="regPassword" name="password" placeholder="••••••••" required minlength="8">
+            <button type="button" class="auth__toggle-password" data-target="regPassword">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="auth__field">
+          <label for="regConfirm" data-i18n="register_confirm">Confirm Password</label>
+          <div class="auth__password-wrapper">
+            <input type="password" id="regConfirm" name="confirm_password" placeholder="••••••••" required>
+            <button type="button" class="auth__toggle-password" data-target="regConfirm">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="h-captcha" data-sitekey="5bf609a4-4478-48ba-bbbc-9d50833a1450"></div>
+
+        <button type="submit" class="btn btn--primary btn--full btn--lg" id="registerBtn" data-i18n="register_button">Create Account</button>
+      </form>
+      
+      <p class="auth__footer">
+        <span data-i18n="register_have_account">Already have an account?</span>
+        <a href="login.html" data-i18n="register_login">Sign in</a>
+      </p>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://js.hcaptcha.com/1/api.js" defer></script>
+  <script src="script.js"></script>
+</body>
+</html>

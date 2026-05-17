@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel — PrimXcapital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="dashboard-page">
+  <div class="dashboard__layout">
+    <aside class="sidebar" id="sidebar">
+      <a href="index.html" class="sidebar__logo">
+        <img src="logo.jpg" alt="PrimXCapital Logo" class="nav__logo-image">
+        <span>Prim<span class="sidebar__logo-accent">X</span></span>
+      </a>
+      <nav class="sidebar__nav">
+        <a href="admin.html" class="sidebar__link sidebar__link--active">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Admin Dashboard</span>
+        </a>
+      </nav>
+    </aside>
+
+    <div class="dashboard__main">
+      <header class="dashboard__header">
+        <button class="dashboard__menu-btn" id="menuBtn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="dashboard__header-right">
+          <div class="dashboard__user">
+            <span style="font-weight:600; color:var(--accent);">Root Administrator</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="dashboard__content">
+        <div class="page-header">
+          <h1 class="page-title">System Ledgers Console</h1>
+          <p class="page-subtitle">Override transactional user states and synchronize data row nodes dynamically.</p>
+        </div>
+
+        <div class="dashboard__history-section">
+          <div class="dash-card">
+            <div class="table-header-row" style="margin-bottom: 16px;">
+              <h3 class="dash-card__title">Transaction Management Matrix</h3>
+            </div>
+            <div class="table-wrapper">
+              <table class="dash-table admin-table">
+                <thead>
+                  <tr>
+                    <th>User Email</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminTransactionsBody">
+                  <tr><td colspan="7" style="text-align:center;">Synchronizing systemic records...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <script src="script.js"></script>
+</body>
+</html>

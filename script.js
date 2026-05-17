@@ -3,7 +3,9 @@
 // ============================================
 
 let supabase;
-
+const AUTH_BASE = "https://yganszqtckixxrstuvad.supabase.co/auth/v1";
+const REST_BASE = "https://yganszqtckixxrstuvad.supabase.co/rest/v1";
+const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlnYW5zenF0Y2tpeHhyc3R1dmFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NjA0MjYsImV4cCI6MjA5NDIzNjQyNn0.Svgyw3nqvKBAYWSI5hIFsM0z3GW-KUiC6xLTuWRCQ7A";
 window.addEventListener("DOMContentLoaded", () => {
   // Global initialization of the Supabase client connection context
   supabase = window.supabase.createClient(
@@ -661,7 +663,7 @@ if (depositForm) {
       alert('Failed to submit deposit. Please try again.');
     }
   });
-}
+  
 
 // --- Withdraw Form ---
 const withdrawForm = document.getElementById('withdrawForm');

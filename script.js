@@ -839,12 +839,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const confirm = document.getElementById("regConfirm").value;
       const btn = document.getElementById("registerBtn");
 
-      if (window.hcaptcha) {
-        const captchaToken = hcaptcha.getResponse();
-        if (!captchaToken) {
-          alert("Please complete captcha");
-          return;
-        }
+      // Check if hCaptcha exists on the window before trying to get a response
+      const captchaToken = window.hcaptcha ? hcaptcha.getResponse() : null;
+      
+      if (window.hcaptcha && !captchaToken) {
+        alert("Please complete captcha");
+        return;
       }
 
       if (password !== confirm) {
@@ -855,36 +855,47 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.textContent = "Creating account...";
       btn.disabled = true;
 
-      if (!supabase) {
-        alert("Database connection context unavailable. Try again in a moment.");
+      try {
+        // Safe check to make sure Supabase is loaded and ready
+        if (!supabase) {
+          alert("Database connection initializing. Please try again in a moment.");
+          btn.textContent = "Create Account";
+          btn.disabled = false;
+          return;
+        }
+
+        // Prepare the basic registration configuration
+        const signUpOptions = { email, password };
+        
+        // Only bundle the captcha configuration if a token was actually generated
+        if (captchaToken) {
+          signUpOptions.options = {
+            captchaToken: captchaToken
+          };
+        }
+
+        const { data, error } = await supabase.auth.signUp(signUpOptions);
+
+        if (error) {
+          alert(error.message);
+          btn.textContent = "Create Account";
+          btn.disabled = false;
+          return;
+        }
+
+        alert("Check your email to verify account");
+        if (window.hcaptcha) hcaptcha.reset();
+
+      } catch (err) {
+        alert("An unexpected registration error occurred.");
+        console.error(err);
+      } finally {
         btn.textContent = "Create Account";
         btn.disabled = false;
-        return;
       }
-
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password
-      });
-
-      if (error) {
-        alert(error.message);
-        btn.textContent = "Create Account";
-        btn.disabled = false;
-        return;
-      }
-
-      alert("Account created successfully! Redirecting...");
-
-      if (window.hcaptcha) hcaptcha.reset();
-      btn.textContent = "Create Account";
-      btn.disabled = false;
-      
-      window.location.href = 'dashboard';
     });
   }
 });
-
 // --- LIVE MARKET ANALYTICS FEED ENGINE ---
 document.addEventListener('DOMContentLoaded', () => {
   const ctx = document.getElementById('livePerformanceChart');

@@ -74,5 +74,60 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2 defer"></script>
   <script src="https://js.hcaptcha.com/1/api.js defer"></script>
   <script src="script.js defer"></script>
+  
+
+  <script>
+    async function handleRegister(e) {
+      e.preventDefault(); // Absolute hard stop on page refresh
+      
+      const email = document.getElementById("regEmail").value;
+      const password = document.getElementById("regPassword").value;
+      const confirm = document.getElementById("regConfirm").value;
+      const btn = document.getElementById("registerBtn");
+
+      if (password !== confirm) {
+        alert("Passwords do not match");
+        return;
+      }
+
+      btn.textContent = "Creating account...";
+      btn.disabled = true;
+
+      if (!window.supabase) {
+        alert("Database connection is initializing. Please try again in a brief moment.");
+        btn.textContent = "Create Account";
+        btn.disabled = false;
+        return;
+      }
+
+      // Initialize an isolated instance for this form session
+      const supabaseClient = window.supabase.createClient(
+        "https://yganszqtckixxrstuvad.supabase.co",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlnYW5zenF0Y2tpeHhyc3R1dmFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NjA0MjYsImV4cCI6MjA5NDIzNjQyNn0.Svgyw3nqvKBAYWSI5hIFsM0z3GW-KUiC6xLTuWRCQ7A"
+      );
+
+      try {
+        const { data, error } = await supabaseClient.auth.signUp({
+          email,
+          password
+        });
+
+        if (error) {
+          alert(error.message);
+          btn.textContent = "Create Account";
+          btn.disabled = false;
+          return;
+        }
+
+        alert("Account created successfully! Redirecting...");
+        window.location.href = 'dashboard.html';
+
+      } catch (err) {
+        alert("An unexpected connection error occurred.");
+        btn.textContent = "Create Account";
+        btn.disabled = false;
+      }
+    }
+          </script>
 </body>
 </html>

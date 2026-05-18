@@ -839,12 +839,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const confirm = document.getElementById("regConfirm").value;
       const btn = document.getElementById("registerBtn");
 
-      // Check if hCaptcha exists on the window before trying to get a response
-      const captchaToken = window.hcaptcha ? hcaptcha.getResponse() : null;
-      
-      if (window.hcaptcha && !captchaToken) {
-        alert("Please complete captcha");
-        return;
+      // Robust check to avoid throwing undefined window errors
+      if (window.hcaptcha) {
+        const captchaToken = hcaptcha.getResponse();
+        if (!captchaToken) {
+          alert("Please complete captcha");
+          return;
+        }
       }
 
       if (password !== confirm) {
@@ -855,40 +856,30 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.textContent = "Creating account...";
       btn.disabled = true;
 
+      if (!supabase) {
+        alert("Database connection context unavailable. Try again in a moment.");
+        btn.textContent = "Create Account";
+        btn.disabled = false;
+        return;
+      }
+
       try {
-        // Safe check to make sure Supabase is loaded and ready
-        if (!supabase) {
-          alert("Database connection initializing. Please try again in a moment.");
-          btn.textContent = "Create Account";
-          btn.disabled = false;
-          return;
-        }
-
-        // Prepare the basic registration configuration
-        const signUpOptions = { email, password };
-        
-        // Only bundle the captcha configuration if a token was actually generated
-        if (captchaToken) {
-          signUpOptions.options = {
-            captchaToken: captchaToken
-          };
-        }
-
-        const { data, error } = await supabase.auth.signUp(signUpOptions);
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password
+        });
 
         if (error) {
           alert(error.message);
-          btn.textContent = "Create Account";
-          btn.disabled = false;
           return;
         }
 
-        alert("Check your email to verify account");
+        alert("Account created successfully! Redirecting...");
         if (window.hcaptcha) hcaptcha.reset();
+        window.location.href = 'dashboard.html';
 
       } catch (err) {
-        alert("An unexpected registration error occurred.");
-        console.error(err);
+        alert("Runtime error: " + err.message);
       } finally {
         btn.textContent = "Create Account";
         btn.disabled = false;
@@ -896,6 +887,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
 // --- LIVE MARKET ANALYTICS FEED ENGINE ---
 document.addEventListener('DOMContentLoaded', () => {
   const ctx = document.getElementById('livePerformanceChart');
@@ -926,9 +918,7 @@ document.addEventListener('DOMContentLoaded', () => {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false } 
-      },
+      plugins: { legend: { display: false } },
       scales: {
         x: {
           grid: { color: 'rgba(255, 255, 255, 0.03)' },
@@ -968,17 +958,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // --- BULLETPROOF PAGE INITIALIZATION HOOK ---
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Check for Dashboard layouts safely by DOM element detection
   if (document.getElementById('dashBalance') || document.getElementById('depositForm') || document.getElementById('withdrawForm') || document.getElementById('profileForm') || document.getElementById('transactionsBody')) {
     loadDashboardData();
   }
 
-  // 2. Check for Admin panel structures
   if (document.getElementById('adminTransactionsBody')) {
     loadAdminData();
   }
 
-  // 3. Fallback translation system initialization
   const savedLang = localStorage.getItem('primx_lang');
   if (savedLang && translations[savedLang]) {
     currentLang = savedLang;

@@ -2,18 +2,12 @@
 // PRIMXCAPITAL — Premium Crypto Investment Platform
 // ============================================
 
-let supabase;
+const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlnYW5zenF0Y2tpeHhyc3R1dmFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NjA0MjYsImV4cCI6MjA5NDI";
 
-// --- Global API & Supabase Configuration Context ---
-const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlnYW5zenF0Y2tpeHhyc3R1dmFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NjA0MjYsImV4cCI6MjA5NDIzNjQyNn0.Svgyw3nqvKBAYWSI5hIFsM0z3GW-KUiC6xLTuWRCQ7A";
-
-// Global initialization of the Supabase client connection context
-if (window.supabase) {
-  supabase = window.supabase.createClient(
-    "https://yganszqtckixxrstuvad.supabase.co",
-    ANON_KEY
-  );
-}
+const supabase = window.supabase.createClient(
+  "https://yganszqtckixxrstuvad.supabase.co",
+  ANON_KEY
+);
 
 // --- Translations ---
 const translations = {
@@ -743,12 +737,12 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.disabled = true;
 
       // CHECK SUPABASE
-      if (!supabase) {
-        alert("Supabase connection failed.");
-        btn.textContent = "Create Account";
-        btn.disabled = false;
-        return;
-      }
+if (typeof supabase === "undefined") {
+  alert("Supabase not loaded. Check script setup.");
+  btn.textContent = "Create Account";
+  btn.disabled = false;
+  return;
+}
 
       try {
 

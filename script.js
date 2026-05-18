@@ -712,23 +712,28 @@ createParticles('particles');
 // --- User Registration Hook ---
 document.addEventListener('DOMContentLoaded', () => {
   const registerForm = document.getElementById("registerForm");
+
   if (registerForm) {
     registerForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
+      const fullName = document.getElementById("regName").value;
       const email = document.getElementById("regEmail").value;
       const password = document.getElementById("regPassword").value;
       const confirm = document.getElementById("regConfirm").value;
       const btn = document.getElementById("registerBtn");
 
+      // CAPTCHA CHECK
       if (window.hcaptcha) {
         const captchaToken = hcaptcha.getResponse();
+
         if (!captchaToken) {
           alert("Please complete captcha");
           return;
         }
       }
 
+      // PASSWORD MATCH CHECK
       if (password !== confirm) {
         alert("Passwords do not match");
         return;
@@ -737,30 +742,78 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.textContent = "Creating account...";
       btn.disabled = true;
 
+      // CHECK SUPABASE
       if (!supabase) {
-        alert("Database connection context unavailable. Try again in a moment.");
+        alert("Supabase connection failed.");
         btn.textContent = "Create Account";
         btn.disabled = false;
         return;
       }
 
       try {
-        const { data, error } = await supabase.auth.signUp({ email, password });
 
+        // CREATE AUTH USER
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password
+        });
+
+        // HANDLE AUTH ERROR
         if (error) {
           alert(error.message);
+          btn.textContent = "Create Account";
+          btn.disabled = false;
           return;
         }
 
-        alert("Account created successfully! Redirecting...");
-        if (window.hcaptcha) hcaptcha.reset();
+        // INSERT PROFILE DATA
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([
+            {
+              id: data.user.id,
+              name: fullName,
+              balance: 0,
+              internet_wallet: 10,
+              total_invest: 0,
+              total_deposits: 0,
+              total_withdrawals: 0,
+              total_interest: 0,
+              profit: 0,
+              tier: 'starter'
+            }
+          ]);
+
+        // HANDLE PROFILE ERROR
+        if (profileError) {
+          console.error(profileError);
+          alert("Profile creation failed.");
+          btn.textContent = "Create Account";
+          btn.disabled = false;
+          return;
+        }
+
+        // RESET CAPTCHA
+        if (window.hcaptcha) {
+          hcaptcha.reset();
+        }
+
+        alert("Account created successfully!");
+
+        // REDIRECT
         window.location.href = 'dashboard.html';
+
       } catch (err) {
+
+        console.error(err);
+
         alert("Runtime error: " + err.message);
+
       } finally {
+
         btn.textContent = "Create Account";
         btn.disabled = false;
-      }
+    }
     });
   }
 });

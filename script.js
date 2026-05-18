@@ -450,7 +450,7 @@ if (loginForm) {
     if (email === 'tylerowennn1@gmail.com' && password === 'Password') {
       localStorage.setItem('session_token', 'admin_token_' + Date.now());
       localStorage.setItem('user_role', 'admin');
-      window.location.href = 'admin';
+      window.location.href = 'admin.html';
       return;
     }
 
@@ -463,7 +463,7 @@ if (loginForm) {
       const data = await res.json();
       if (data.token) {
         localStorage.setItem('session_token', data.token);
-        window.location.href = 'dashboard';
+        window.location.href = 'dashboard.html';
       } else {
         btn.textContent = 'Invalid credentials';
         btn.disabled = false;
@@ -523,7 +523,7 @@ if (logoutBtn) {
 async function loadDashboardData() {
   const token = localStorage.getItem('session_token');
   if (!token) {
-    window.location.href = 'login';
+    window.location.href = 'login.html';
     return;
   }
 
@@ -589,7 +589,7 @@ async function loadAdminData() {
 
     if (authError || !user || user.email !== 'tylerowennn1@gmail.com') {
       alert("Access Denied: Administrative privileges required.");
-      window.location.href = "dashboard";
+      window.location.href = "dashboard.html";
       return;
     }
 
@@ -650,7 +650,7 @@ if (depositForm) {
   depositForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('session_token');
-    if (!token) { window.location.href = 'login'; return; }
+    if (!token) { window.location.href = 'login.html'; return; }
 
     const amount = document.getElementById('depositAmount').value;
     const method = document.getElementById('depositMethod').value;
@@ -680,7 +680,7 @@ if (depositForm) {
       });
 
       alert('Deposit submitted successfully! It will be reviewed shortly.');
-      window.location.href = 'dashboard';
+      window.location.href = 'dashboard.html';
     } catch (err) {
       alert('Failed to submit deposit. Please try again.');
     }
@@ -693,7 +693,7 @@ if (withdrawForm) {
   withdrawForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const token = localStorage.getItem('session_token');
-    if (!token) { window.location.href = 'login'; return; }
+    if (!token) { window.location.href = 'login.html'; return; }
 
     const amount = document.getElementById('withdrawAmount').value;
     const method = document.getElementById('withdrawMethod').value;

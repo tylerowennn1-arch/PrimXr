@@ -55,12 +55,11 @@
         <div class="h-captcha" data-sitekey="5bf609a4-4478-48ba-bbbc-9d50833a1450"></div>
 
         <button type="submit" class="btn btn--primary btn--full btn--lg" id="registerBtn">Create Account</button>
-        <button
-type="button"
-id="googleBtn"
-class="btn btn--full">
-Continue with Google
-        </button>
+        <div class="auth__divider"><span>OR</span></div>
+<button type="button" id="googleBtn" class="auth__submit auth__submit--google">
+  <img src="https://www.google.com/favicon.ico" alt="Google" style="width:16px; margin-right:8px; vertical-align:middle;">
+  Continue with Google
+</button>
 
       </form>
       
@@ -73,26 +72,6 @@ Continue with Google
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://js.hcaptcha.com/1/api.js" defer></script>
-   <script>
-    const googleBtn = document.getElementById("googleBtn");
-
-    if (googleBtn) {
-      googleBtn.addEventListener("click", async () => {
-
-        const client = getSupabase();
-
-        const { error } = await client.auth.signInWithOAuth({
-          provider: "google",
-          options: {
-            redirectTo: window.location.origin + "/dashboard.html"
-          }
-        });
-
-        if (error) alert(error.message);
-
-      });
-    }
-   </script>
   <script src="script.js"></script>
 </body>
 </html>

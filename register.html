@@ -60,27 +60,8 @@ type="button"
 id="googleBtn"
 class="btn btn--full">
 Continue with Google
-</button>
+        </button>
 
-<script>
-const googleBtn = document.getElementById("googleBtn");
-
-if (googleBtn) {
-  googleBtn.addEventListener("click", async () => {
-
-    const client = getSupabase();
-
-    const { error } = await client.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: window.location.origin + "/dashboard.html"
-      }
-    });
-
-    if (error) alert(error.message);
-  });
-}
-</script>
       </form>
       
       <p class="auth__footer">
@@ -92,6 +73,26 @@ if (googleBtn) {
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://js.hcaptcha.com/1/api.js" defer></script>
+   <script>
+    const googleBtn = document.getElementById("googleBtn");
+
+    if (googleBtn) {
+      googleBtn.addEventListener("click", async () => {
+
+        const client = getSupabase();
+
+        const { error } = await client.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: window.location.origin + "/dashboard.html"
+          }
+        });
+
+        if (error) alert(error.message);
+
+      });
+    }
+   </script>
   <script src="script.js"></script>
 </body>
 </html>

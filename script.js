@@ -523,3 +523,30 @@ runSafe(() => {
   }
   applyTranslations();
 });
+// --- GOOGLE SIGN-IN HANDLER ---
+runSafe(() => {
+  const googleBtn = document.getElementById('googleBtn');
+  
+  if (googleBtn) {
+    googleBtn.addEventListener('click', async (e) => {
+      e.preventDefault(); // Dynamic safety: Stops the page from refreshing!
+      
+      const supabaseClient = getSupabase();
+      if (!supabaseClient) {
+        alert("Supabase is not initialized yet.");
+        return;
+      }
+
+      const { error } = await supabaseClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + '/dashboard.html'
+        }
+      });
+
+      if (error) {
+        alert("Google Login Error: " + error.message);
+      }
+    });
+  }
+});

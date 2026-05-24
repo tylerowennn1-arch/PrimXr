@@ -245,10 +245,7 @@ runSafe(() => {
       const confirm = document.getElementById("regConfirm").value;
       const btn = document.getElementById("registerBtn");
 
-      if (window.hcaptcha && !hcaptcha.getResponse()) {
-        alert("Please complete the captcha verification.");
-        return;
-      }
+      
 
       if (password !== confirm) {
         alert("Passwords do not match");
@@ -258,7 +255,10 @@ runSafe(() => {
       btn.textContent = "Creating account...";
       btn.disabled = true;
 
-      const client = getSupabase();
+      const client = window.supabase.createClient(
+  SUPABASE_URL,
+  ANON_KEY
+);
       if (!client) {
         alert("Supabase library initialization pending. Try again in a second.");
         btn.textContent = "Create Account";
@@ -291,10 +291,7 @@ runSafe(() => {
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      if (window.hcaptcha && !hcaptcha.getResponse()) {
-        alert("Please complete the captcha verification.");
-        return;
-      }
+      
       
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
@@ -303,7 +300,10 @@ runSafe(() => {
       btn.textContent = 'Signing in...';
       btn.disabled = true;
 
-      const client = getSupabase();
+      const client = window.supabase.createClient(
+  SUPABASE_URL,
+  ANON_KEY
+);
       if (!client) {
         alert("Supabase initialization error.");
         btn.textContent = 'Sign In';

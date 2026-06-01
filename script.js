@@ -1,5 +1,5 @@
 let supabase;
-const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlnYW5zenF0Y2tpeHhyc3R1dmFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NjA0MjYsImV4cCI6MjA5NDIzNjQyNn0.Svgyw3nqvKBAYWSI5[...]";
+const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlnYW5zenF0Y2tpeHhyc3R1dmFkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODY2MDQyNiwiZXhwIjoyMDk0MjM2NDI2fQ.NgVUuEbYbLSc9Vnbc6QT1gK2nEmqxRbZ-zx-Ckcn_UYzNjQyNn0.Svgyw3nqvKBAYWSI5";
 const SUPABASE_URL = "https://yganszqtckixxrstuvad.supabase.co";
 
 function initSupabase() {

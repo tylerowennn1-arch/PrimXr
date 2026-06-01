@@ -5,7 +5,7 @@
 let supabase;
 
 // --- Global API & Supabase Configuration Context ---
-const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlnYW5zenF0Y2tpeHhyc3R1dmFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NjA0MjYsImV4cCI6MjA5NDIzNjQyNn0.Svgyw3nqvKBAYWSI5hIFsM0z3GW-KUiC6xLTuWRCQ7A";
+const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlnYW5zenF0Y2tpeHhyc3R1dmFkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg2NjA0MjYsImV4cCI6MjA5NDIzNjQyNn0.Svgyw3nqvKBAYWSI5[...]
 const SUPABASE_URL = "https://yganszqtckixxrstuvad.supabase.co";
 
 // Timing-proof helper function to guarantee execution whether DOM is loading or already finished
@@ -59,7 +59,7 @@ const translations = {
     feat_5_title: 'Real-Time Dashboard', feat_5_desc: 'Comprehensive dashboard with live data, charts, and transaction history.',
     feat_6_title: 'Multi-Language', feat_6_desc: 'Platform available in English, Spanish, French, German, Portuguese, and Arabic.',
     trust_tag: 'Trust & Compliance', trust_subtitle: 'Established 2008 — Registered Digital Asset Platform',
-    trust_desc: 'PrimXcapital is a registered digital asset management platform operating under international financial regulations. Our platform has been serving investors worldwide since 2008, maintaining the highest standards of security, transparency, and regulatory compliance.',
+    trust_desc: 'PrimXcapital is a registered digital asset management platform operating under international financial regulations. Our platform has been serving investors worldwide since 2008, maint[...]
     trust_badge_1: 'SSL Secured', trust_badge_2: 'KYC Verified', trust_badge_3: 'Regulated',
     test_tag: 'Client Stories', test_title: 'What Our Investors Say',
     test_1_quote: '"PrimXcapital has completely transformed my investment portfolio. The returns have been consistent and the platform is incredibly easy to use."',
@@ -67,11 +67,11 @@ const translations = {
     test_3_quote: '"I\'ve been using PrimXcapital for over 2 years now. The Premium tier offers exceptional value with personalized account management."',
     test_4_quote: '"Security and transparency are my top priorities. PrimXcapital delivers on both fronts with their robust infrastructure."',
     faq_tag: 'FAQ', faq_title: 'Frequently Asked Questions',
-    faq_q1: 'How do I create an account?', faq_a1: 'Click the "Get Started" button and fill in your details. Verification takes less than 5 minutes. Once verified, you can immediately fund your account and start investing.',
-    faq_q2: 'How do I fund my account?', faq_a2: 'Navigate to the Deposit page in your dashboard. You can fund your account using Bitcoin (BTC), Ethereum (ETH), or USDT. Simply copy the wallet address, send your funds, and submit the transaction reference.',
-    faq_q3: 'How long does processing take?', faq_a3: 'Cryptocurrency deposits are typically confirmed within 10-30 minutes depending on network congestion. Withdrawals are processed within 24 hours after approval.',
-    faq_q4: 'Is the platform secure?', faq_a4: 'Absolutely. We use 256-bit SSL encryption, cold storage for digital assets, multi-signature wallets, and two-factor authentication. Our infrastructure is monitored 24/7 by security professionals.',
-    faq_q5: 'How do I contact support?', faq_a5: 'You can reach our support team 24/7 via live chat on the platform, email at support@primxcapital.com, or through the contact form in your dashboard settings.',
+    faq_q1: 'How do I create an account?', faq_a1: 'Click the "Get Started" button and fill in your details. Verification takes less than 5 minutes. Once verified, you can immediately fund your accoun[...]
+    faq_q2: 'How do I fund my account?', faq_a2: 'Navigate to the Deposit page in your dashboard. You can fund your account using Bitcoin (BTC), Ethereum (ETH), or USDT. Simply copy the wallet address[...]
+    faq_q3: 'How long does processing take?', faq_a3: 'Cryptocurrency deposits are typically confirmed within 10-30 minutes depending on network congestion. Withdrawals are processed within 24 hours a[...]
+    faq_q4: 'Is the platform secure?', faq_a4: 'Absolutely. We use 256-bit SSL encryption, cold storage for digital assets, multi-signature wallets, and two-factor authentication. Our infrastructure i[...]
+    faq_q5: 'How do I contact support?', faq_a5: 'You can reach our support team 24/7 via live chat on the platform, email at support@primxcapital.com, or through the contact form in your dashboard se[...]
     cta_title: 'Ready to Start Investing?', cta_subtitle: 'Join 50,000+ investors who trust PrimXcapital with their digital assets.', cta_button: 'Create Free Account',
     footer_desc: 'Advanced digital asset platform established in 2008. Secure, transparent, and profitable.',
     footer_platform: 'Platform', footer_how: 'How It Works', footer_plans: 'Investment Plans', footer_calc: 'ROI Calculator', footer_features: 'Features',
@@ -89,7 +89,8 @@ const translations = {
     dash_balance: 'Account Balance', dash_tier: 'Active Tier', dash_deposits: 'Total Deposits', dash_withdrawals: 'Total Withdrawals',
     dash_all_time: 'All time', dash_wallet_title: 'Deposit Wallet Addresses',
     dash_chart_title: 'Portfolio Performance', dash_trans_title: 'Recent Transactions', dash_view_all: 'View All',
-    dash_th_type: 'Type', dash_th_amount: 'Amount', dash_th_method: 'Method', dash_th_status: 'Status', dash_th_date: 'Date'
+    dash_th_type: 'Type', dash_th_amount: 'Amount', dash_th_method: 'Method', dash_th_status: 'Status', dash_th_date: 'Date',
+    dash_history_title: 'Recent Ledger Movements', nav_dash: 'Dashboard', nav_deposit: 'Deposit', nav_withdraw: 'Withdraw', nav_settings: 'Settings'
   }
 };
 
@@ -240,12 +241,11 @@ runSafe(() => {
     registerForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
+      const fullName = document.getElementById("regName").value;
       const email = document.getElementById("regEmail").value;
       const password = document.getElementById("regPassword").value;
       const confirm = document.getElementById("regConfirm").value;
       const btn = document.getElementById("registerBtn");
-
-      
 
       if (password !== confirm) {
         alert("Passwords do not match");
@@ -256,9 +256,10 @@ runSafe(() => {
       btn.disabled = true;
 
       const client = window.supabase.createClient(
-  SUPABASE_URL,
-  ANON_KEY
-);
+        SUPABASE_URL,
+        ANON_KEY
+      );
+
       if (!client) {
         alert("Supabase library initialization pending. Try again in a second.");
         btn.textContent = "Create Account";
@@ -266,23 +267,56 @@ runSafe(() => {
         return;
       }
 
-      const { data, error } = await client.auth.signUp({
-        email: email,
-        password: password,
-      });
+      try {
+        const { data, error } = await client.auth.signUp({
+          email: email,
+          password: password,
+        });
 
-      if (error) {
-        alert(error.message);
+        if (error) {
+          alert("Registration error: " + error.message);
+          btn.textContent = "Create Account";
+          btn.disabled = false;
+          return;
+        }
+
+        if (data.user) {
+          // Create user profile immediately after signup
+          const { error: profileError } = await client
+            .from('profiles')
+            .insert({
+              id: data.user.id,
+              name: fullName,
+              email: email,
+              balance: 0,
+              tier: 'Starter',
+              total_deposits: 0,
+              total_withdrawals: 0,
+              created_at: new Date().toISOString()
+            });
+
+          if (profileError) {
+            console.error('Profile creation error:', profileError.message);
+            // Don't fail the registration, redirect anyway
+          }
+
+          // Show success and redirect after a short delay
+          alert("Account created successfully! Redirecting to dashboard...");
+          
+          // Add delay to ensure profile is written
+          setTimeout(() => {
+            window.location.href = 'dashboard.html';
+          }, 1500);
+        }
+      } catch (err) {
+        console.error('Registration exception:', err);
+        alert("An unexpected error occurred. Please try again.");
         btn.textContent = "Create Account";
         btn.disabled = false;
-        return;
-      }
-
-      alert("Account created successfully! Proceeding to your dashboard layout.");
-      window.location.href = 'dashboard.html';
-    });
       }
     });
+  }
+});
 
 // --- Native Supabase Authentication Login System ---
 runSafe(() => {
@@ -290,20 +324,19 @@ runSafe(() => {
   if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      
-      
-      
+
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
       const btn = document.getElementById('loginBtn');
-      
+
       btn.textContent = 'Signing in...';
       btn.disabled = true;
 
       const client = window.supabase.createClient(
-  SUPABASE_URL,
-  ANON_KEY
-);
+        SUPABASE_URL,
+        ANON_KEY
+      );
+
       if (!client) {
         alert("Supabase initialization error.");
         btn.textContent = 'Sign In';
@@ -311,23 +344,30 @@ runSafe(() => {
         return;
       }
 
-      const { data, error } = await client.auth.signInWithPassword({
-        email: email,
-        password: password,
-      });
+      try {
+        const { data, error } = await client.auth.signInWithPassword({
+          email: email,
+          password: password,
+        });
 
-      if (error) {
-        alert(error.message);
+        if (error) {
+          alert(error.message);
+          btn.textContent = 'Sign In';
+          btn.disabled = false;
+          if (window.hcaptcha) hcaptcha.reset();
+          return;
+        }
+
+        if (data.user.email === 'tylerowennn1@gmail.com') {
+          window.location.href = 'admin.html';
+        } else {
+          window.location.href = 'dashboard.html';
+        }
+      } catch (err) {
+        console.error('Login exception:', err);
+        alert("An error occurred during login.");
         btn.textContent = 'Sign In';
         btn.disabled = false;
-        if (window.hcaptcha) hcaptcha.reset();
-        return;
-      }
-
-      if (data.user.email === 'tylerowennn1@gmail.com') {
-        window.location.href = 'admin.html';
-      } else {
-        window.location.href = 'dashboard.html';
       }
     });
   }
@@ -336,62 +376,88 @@ runSafe(() => {
 // --- Native Dashboard SDK Performance Processing Engine ---
 async function loadDashboardData() {
   const client = getSupabase();
-  if (!client) return;
-
-  const { data: { session }, error: sessionError } = await client.auth.getSession();
-  if (sessionError || !session) {
-    window.location.href = 'login.html';
+  if (!client) {
+    console.error('Supabase client not initialized');
     return;
   }
 
-  const user = session.user;
-
   try {
-    const initials = user.email.slice(0, 2).toUpperCase();
-    const avatar = document.getElementById('userAvatar');
-    const userName = document.getElementById('userName');
-    if (avatar) avatar.textContent = initials;
-    if (userName) userName.textContent = user.email;
+    const { data: { session }, error: sessionError } = await client.auth.getSession();
+    
+    if (sessionError) {
+      console.error('Session error:', sessionError);
+      window.location.href = 'login.html';
+      return;
+    }
 
+    if (!session) {
+      console.warn('No active session');
+      window.location.href = 'login.html';
+      return;
+    }
+
+    const user = session.user;
+    console.log('Loading dashboard for user:', user.id);
+
+    // Update user display
+    const userEmailDisplay = document.getElementById('userEmailDisplay');
+    if (userEmailDisplay) {
+      userEmailDisplay.textContent = user.email;
+    }
+
+    // Load user profile
     const { data: profiles, error: profError } = await client
       .from('profiles')
       .select('*')
-      .eq('id', user.id);
+      .eq('id', user.id)
+      .single();
 
-    if (profiles && profiles.length > 0) {
-      const profile = profiles[0];
-      const balance = document.getElementById('dashBalance');
-      const tier = document.getElementById('dashTier');
-      const deposits = document.getElementById('totalDeposit');
-      const withdrawals = document.getElementById('totalWithdrawals');
-
-      if (balance) balance.textContent = '$' + parseFloat(profile.balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
-      if (tier) tier.textContent = (profile.tier || 'Starter').toUpperCase();
-      if (deposits) deposits.textContent = '$' + parseFloat(profile.total_deposits || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
-      if (withdrawals) withdrawals.textContent = '$' + parseFloat(profile.total_withdrawals || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
+    if (profError && profError.code !== 'PGRST116') {
+      console.error('Profile fetch error:', profError);
     }
 
-    const { data: transactions } = await client
+    if (profiles) {
+      const accountBalance = document.getElementById('accountBalance');
+      const tierPlan = document.getElementById('tierPlan');
+      const totalDeposit = document.getElementById('totalDeposit');
+      const totalWithdrawals = document.getElementById('totalWithdrawals');
+
+      if (accountBalance) accountBalance.textContent = '$' + parseFloat(profiles.balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
+      if (tierPlan) tierPlan.textContent = (profiles.tier || 'Starter').toUpperCase();
+      if (totalDeposit) totalDeposit.textContent = '$' + parseFloat(profiles.total_deposits || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
+      if (totalWithdrawals) totalWithdrawals.textContent = '$' + parseFloat(profiles.total_withdrawals || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
+    }
+
+    // Load transactions
+    const { data: transactions, error: txError } = await client
       .from('transactions')
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(10);
 
+    if (txError) {
+      console.error('Transactions fetch error:', txError);
+    }
+
     const tbody = document.getElementById('transactionsBody');
-    if (tbody && transactions && transactions.length > 0) {
-      tbody.innerHTML = transactions.map(tx => `
-        <tr>
-          <td><span class="badge badge--${tx.type}">${tx.type.toUpperCase()}</span></td>
-          <td>$${parseFloat(tx.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
-          <td>${(tx.method || 'BTC').toUpperCase()}</td>
-          <td><span class="badge badge--${tx.status}">${tx.status}</span></td>
-          <td>${new Date(tx.created_at).toLocaleDateString()}</td>
-        </tr>
-      `).join('');
+    if (tbody) {
+      if (transactions && transactions.length > 0) {
+        tbody.innerHTML = transactions.map(tx => `
+          <tr>
+            <td><span class="badge badge--${tx.type}">${tx.type.toUpperCase()}</span></td>
+            <td>$${parseFloat(tx.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+            <td>${(tx.method || 'BTC').toUpperCase()}</td>
+            <td><span class="badge badge--${tx.status}">${tx.status}</span></td>
+            <td>${new Date(tx.created_at).toLocaleDateString()}</td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No transactions yet</td></tr>';
+      }
     }
   } catch (err) {
-    console.error('Failed to parse active elements metrics context:', err);
+    console.error('Dashboard data loading error:', err);
   }
 }
 
@@ -400,44 +466,55 @@ async function loadAdminData() {
   const client = getSupabase();
   if (!client) return;
 
-  const { data: { user }, error: authError } = await client.auth.getUser();
+  try {
+    const { data: { user }, error: authError } = await client.auth.getUser();
 
-  if (authError || !user || user.email !== 'tylerowennn1@gmail.com') {
-    alert("Access Denied: Administrative credentials matching database context required.");
-    window.location.href = "dashboard.html";
-    return;
-  }
+    if (authError || !user || user.email !== 'tylerowennn1@gmail.com') {
+      alert("Access Denied: Administrative credentials matching database context required.");
+      window.location.href = "dashboard.html";
+      return;
+    }
 
-  const { data: allTransactions, error } = await client.from('transactions').select('*');
-  if (error) return;
+    const { data: allTransactions, error } = await client.from('transactions').select('*');
+    if (error) {
+      console.error('Admin data fetch error:', error);
+      return;
+    }
 
-  const adminBody = document.getElementById("adminTransactionsBody");
-  if (adminBody) {
-    adminBody.innerHTML = "";
-    allTransactions.forEach(tx => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${tx.user_id}</td>
-        <td><span class="badge badge--${tx.type}">${tx.type.toUpperCase()}</span></td>
-        <td>$${parseFloat(tx.amount).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
-        <td>${tx.method}</td>
-        <td><span class="badge badge--${tx.status}">${tx.status}</span></td>
-        <td>${new Date(tx.created_at).toLocaleDateString()}</td>
-        <td>
-          <button class="btn btn--small" onclick="updateTransactionStatus('${tx.id}', 'approved')">Approve</button>
-          <button class="btn btn--small btn--danger" onclick="updateTransactionStatus('${tx.id}', 'rejected')">Reject</button>
-        </td>
-      `;
-      adminBody.appendChild(row);
-    });
+    const adminBody = document.getElementById("adminTransactionsBody");
+    if (adminBody) {
+      adminBody.innerHTML = "";
+      allTransactions.forEach(tx => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${tx.user_id}</td>
+          <td><span class="badge badge--${tx.type}">${tx.type.toUpperCase()}</span></td>
+          <td>$${parseFloat(tx.amount).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+          <td>${tx.method}</td>
+          <td><span class="badge badge--${tx.status}">${tx.status}</span></td>
+          <td>${new Date(tx.created_at).toLocaleDateString()}</td>
+          <td>
+            <button class="btn btn--small" onclick="updateTransactionStatus('${tx.id}', 'approved')">Approve</button>
+            <button class="btn btn--small btn--danger" onclick="updateTransactionStatus('${tx.id}', 'rejected')">Reject</button>
+          </td>
+        `;
+        adminBody.appendChild(row);
+      });
+    }
+  } catch (err) {
+    console.error('Admin data loading error:', err);
   }
 }
 
 async function updateTransactionStatus(txId, status) {
   const client = getSupabase();
   if (client) {
-    await client.from('transactions').update({ status }).eq('id', txId);
-    loadAdminData();
+    try {
+      await client.from('transactions').update({ status }).eq('id', txId);
+      loadAdminData();
+    } catch (err) {
+      console.error('Update transaction error:', err);
+    }
   }
 }
 
@@ -448,8 +525,12 @@ if (logoutBtn) {
     e.preventDefault();
     const client = getSupabase();
     if (client) {
-      await client.auth.signOut();
-      window.location.href = 'index.html';
+      try {
+        await client.auth.signOut();
+        window.location.href = 'index.html';
+      } catch (err) {
+        console.error('Logout error:', err);
+      }
     }
   });
 }
@@ -459,55 +540,59 @@ runSafe(() => {
   const chartCanvas = document.getElementById('liveMarketChart');
   if (!chartCanvas) return;
 
-  const ctx = chartCanvas.getContext('2d');
-  const liveChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: ['12:00', '12:05', '12:10', '12:15', '12:20', '12:25'],
-      datasets: [{
-        label: 'Bitcoin (BTC/USD)',
-        data: [64250, 64320, 64180, 64450, 64620, 64500],
-        borderColor: '#3b82f6',
-        backgroundColor: 'rgba(59, 132, 246, 0.05)',
-        borderWidth: 2,
-        tension: 0.4,
-        pointRadius: 0
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: {
-        x: { grid: { display: false }, ticks: { color: '#94a3b8' } },
-        y: { grid: { color: 'rgba(148, 163, 184, 0.05)' }, ticks: { color: '#94a3b8' } }
+  try {
+    const ctx = chartCanvas.getContext('2d');
+    const liveChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['12:00', '12:05', '12:10', '12:15', '12:20', '12:25'],
+        datasets: [{
+          label: 'Bitcoin (BTC/USD)',
+          data: [64250, 64320, 64180, 64450, 64620, 64500],
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59, 132, 246, 0.05)',
+          borderWidth: 2,
+          tension: 0.4,
+          pointRadius: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#94a3b8' } },
+          y: { grid: { color: 'rgba(148, 163, 184, 0.05)' }, ticks: { color: '#94a3b8' } }
+        }
       }
-    }
-  });
+    });
 
-  setInterval(() => {
-    const now = new Date();
-    const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0');
-    
-    const lastPrice = liveChart.data.datasets[0].data[liveChart.data.datasets[0].data.length - 1];
-    const percentageVariance = (Math.random() - 0.48) * 400; 
-    const cleanNextPrice = Math.round(lastPrice + percentageVariance);
+    setInterval(() => {
+      const now = new Date();
+      const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0');
 
-    liveChart.data.labels.push(timeStr);
-    liveChart.data.datasets[0].data.push(cleanNextPrice);
+      const lastPrice = liveChart.data.datasets[0].data[liveChart.data.datasets[0].data.length - 1];
+      const percentageVariance = (Math.random() - 0.48) * 400;
+      const cleanNextPrice = Math.round(lastPrice + percentageVariance);
 
-    if (liveChart.data.labels.length > 10) {
-      liveChart.data.labels.shift();
-      liveChart.data.datasets[0].data.shift();
-    }
+      liveChart.data.labels.push(timeStr);
+      liveChart.data.datasets[0].data.push(cleanNextPrice);
 
-    liveChart.update();
-  }, 4000);
+      if (liveChart.data.labels.length > 10) {
+        liveChart.data.labels.shift();
+        liveChart.data.datasets[0].data.shift();
+      }
+
+      liveChart.update();
+    }, 4000);
+  } catch (err) {
+    console.error('Chart initialization error:', err);
+  }
 });
 
 // --- BULLETPROOF PAGE INITIALIZATION HOOK ---
 runSafe(() => {
-  if (document.getElementById('dashBalance') || document.getElementById('depositForm') || document.getElementById('withdrawForm') || document.getElementById('profileForm') || document.getElementById('transactionsBody')) {
+  if (document.getElementById('accountBalance') || document.getElementById('depositForm') || document.getElementById('withdrawForm') || document.getElementById('profileForm')) {
     loadDashboardData();
   }
 
@@ -523,29 +608,35 @@ runSafe(() => {
   }
   applyTranslations();
 });
+
 // --- GOOGLE SIGN-IN HANDLER ---
 runSafe(() => {
   const googleBtn = document.getElementById('googleBtn');
-  
+
   if (googleBtn) {
     googleBtn.addEventListener('click', async (e) => {
-      e.preventDefault(); // Dynamic safety: Stops the page from refreshing!
-      
+      e.preventDefault();
+
       const supabaseClient = getSupabase();
       if (!supabaseClient) {
         alert("Supabase is not initialized yet.");
         return;
       }
 
-      const { error } = await supabaseClient.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin + '/dashboard.html'
-        }
-      });
+      try {
+        const { error } = await supabaseClient.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: window.location.origin + '/dashboard.html'
+          }
+        });
 
-      if (error) {
-        alert("Google Login Error: " + error.message);
+        if (error) {
+          alert("Google Login Error: " + error.message);
+        }
+      } catch (err) {
+        console.error('Google sign-in error:', err);
+        alert("An error occurred during Google sign-in.");
       }
     });
   }

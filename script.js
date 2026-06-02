@@ -7,12 +7,14 @@ const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
 const SUPABASE_URL = "https://yganszqtckixxrstuvad.supabase.co";
 
 // Initialize Supabase Client immediately
-const supabase = window.supabase ? window.supabase.createClient(SUPABASE_URL, ANON_KEY) : null;
+let _supabaseInstance = null;
 
 function getSupabase() {
-  return supabase;
+  if (!_supabaseInstance && window.supabase) {
+    _supabaseInstance = window.supabase.createClient(SUPABASE_URL, ANON_KEY);
+  }
+  return _supabaseInstance;
 }
-
 // Timing-proof helper function
 function runSafe(callback) {
   if (document.readyState === "loading") {

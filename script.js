@@ -303,10 +303,7 @@ runSafe(() => {
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      if (window.hcaptcha && !hcaptcha.getResponse()) {
-        alert("Please complete the captcha verification.");
-        return;
-      }
+  
       
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;

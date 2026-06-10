@@ -265,9 +265,18 @@ runSafe(() => {
         return;
       }
 
+      const signUpOptions = {};
+      if (window.hcaptcha) {
+        const token = hcaptcha.getResponse();
+        if (token) {
+          signUpOptions.captchaToken = token;
+        }
+      }
+
       const { data, error } = await client.auth.signUp({
         email: email,
         password: password,
+        options: signUpOptions,
       });
 
       if (error) {
@@ -277,9 +286,9 @@ runSafe(() => {
         return;
       }
 
-      // Create profile entry for the new user
+      // Create profile entry for the new user (using upsert to prevent unique key violations if DB trigger also runs)
       if (data.user) {
-        await client.from('profiles').insert([
+        await client.from('profiles').upsert([
           { id: data.user.id, email: email, balance: 0, tier: 'starter' }
         ]);
       }
@@ -312,6 +321,13 @@ runSafe(() => {
       btn.textContent = 'Signing in...';
       btn.disabled = true;
 
+      if (window.hcaptcha && !hcaptcha.getResponse()) {
+        alert("Please complete the captcha verification.");
+        btn.textContent = 'Sign In';
+        btn.disabled = false;
+        return;
+      }
+
       const client = getSupabase();
       if (!client) {
         alert("Supabase initialization error.");
@@ -320,9 +336,18 @@ runSafe(() => {
         return;
       }
 
+      const signInOptions = {};
+      if (window.hcaptcha) {
+        const token = hcaptcha.getResponse();
+        if (token) {
+          signInOptions.captchaToken = token;
+        }
+      }
+
       const { data, error } = await client.auth.signInWithPassword({
         email: email,
         password: password,
+        options: signInOptions,
       });
 
       if (error) {

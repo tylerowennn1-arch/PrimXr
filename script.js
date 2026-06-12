@@ -293,14 +293,15 @@ runSafe(() => {
           {
   id: data.user.id,
   name: fullName,
-  email: email,
-  Deposit balance: 10,
-  Interest wallet balance: 0
-  tier: selectedTier,
+  balance: 10,
+  interest_wallet: 0,
+  total_invest: 0,
   total_deposits: 0,
   total_withdrawals: 0,
-  total_invest: 0
-          }
+  total_interest: 0,
+  profit: 0,
+  tier: selectedTier
+            }
       // Check if email confirmation is required (prevents redirect loop)
       if (!data.session) {
         alert("Account created! Please check your email to confirm your account before logging in.");
@@ -391,9 +392,9 @@ async function loadDashboardData() {
   try {
     const initials = user.email.slice(0, 2).toUpperCase();
     const avatar = document.getElementById('userAvatar');
-    const userName = document.getElementById('userName');
+    const userName = document.getElementById('userNameDisplay');
     if (avatar) avatar.textContent = initials;
-    if (userName) userName.textContent = user.email;
+    if (userName) userName.textContent = profile.name || user.email;
 
     const { data: profiles, error: profError } = await client
       .from('profiles')
@@ -403,15 +404,20 @@ async function loadDashboardData() {
 
     if (profiles) {
       const profile = profiles;
-      const balance = document.getElementById('dashBalance');
-      const tier = document.getElementById('dashTier');
+      const balance = document.getElementById('accountBalance');
+      const tier = document.getElementById('tierplan');
       const deposits = document.getElementById('totalDeposit');
       const withdrawals = document.getElementById('totalWithdrawals');
-
+      const interestWallet = document.getElementById('interestWallet');
+      
       if (balance) balance.textContent = '$' + parseFloat(profile.balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
       if (tier) tier.textContent = (profile.tier || 'Starter').toUpperCase();
       if (deposits) deposits.textContent = '$' + parseFloat(profile.total_deposits || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
       if (withdrawals) withdrawals.textContent = '$' + parseFloat(profile.total_withdrawals || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
+      if (interestWallet)
+interestWallet.textContent =
+'$' + parseFloat(profile.interest_wallet || 0)
+.toLocaleString('en-US', { minimumFractionDigits: 2 });
     }
 
     const { data: transactions } = await client

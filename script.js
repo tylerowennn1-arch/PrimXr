@@ -407,7 +407,7 @@ async function loadDashboardData() {
     if (profiles) {
       const profile = profiles;
       const balance = document.getElementById('accountBalance');
-      const tier = document.getElementById('tierplan');
+      const tier = document.getElementById('tierPlan');
       const deposits = document.getElementById('totalDeposit');
       const withdrawals = document.getElementById('totalWithdrawals');
       const interestWallet = document.getElementById('interestWallet');

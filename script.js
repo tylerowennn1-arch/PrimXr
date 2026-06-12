@@ -312,7 +312,9 @@ runSafe(() => {
         alert("Account created successfully!");
         window.location.href = 'dashboard.html';
       }
-    }
+    });
+  }
+});
 
 // --- Native Supabase Authentication Login System ---
 runSafe(() => {

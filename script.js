@@ -572,7 +572,7 @@ runSafe(() => {
 
 // --- BULLETPROOF PAGE INITIALIZATION HOOK ---
 runSafe(() => {
-  if (document.getElementById('userNameDisplay')) {
+  if (document.getElementById('userName')) {
     loadDashboardData();
   }
   if (document.getElementById('adminTransactionsBody')) {

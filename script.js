@@ -238,7 +238,8 @@ runSafe(() => {
   if (registerForm) {
     registerForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-
+      const fullName = document.getElementById("regName").value;
+      const selectedTier = document.getElementById("regTier").value;
       const email = document.getElementById("regEmail").value;
       const password = document.getElementById("regPassword").value;
       const confirm = document.getElementById("regConfirm").value;
@@ -289,10 +290,17 @@ runSafe(() => {
       // Create profile entry for the new user (using upsert to prevent unique key violations if DB trigger also runs)
       if (data.user) {
         await client.from('profiles').upsert([
-          { id: data.user.id, email: email, balance: 0, tier: 'starter' }
-        ]);
-      }
-
+          {
+  id: data.user.id,
+  name: fullName,
+  email: email,
+  Deposit balance: 10,
+  Interest wallet balance: 0
+  tier: selectedTier,
+  total_deposits: 0,
+  total_withdrawals: 0,
+  total_invest: 0
+          }
       // Check if email confirmation is required (prevents redirect loop)
       if (!data.session) {
         alert("Account created! Please check your email to confirm your account before logging in.");

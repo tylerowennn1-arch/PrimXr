@@ -20,8 +20,22 @@
       <p class="auth__subtitle">Start your investment journey today</p>
       
       <form class="auth__form" id="registerForm">
+
         
         <div class="auth__field">
+  <label for="regName">Full Name</label>
+  <input type="text" id="regName" placeholder="John Doe" required>
+</div>
+
+<div class="auth__field">
+  <label for="regTier">Choose Plan</label>
+  <select id="regTier" required>
+    <option value="starter">Starter</option>
+    <option value="basic">Basic</option>
+    <option value="standard">Standard</option>
+    <option value="premium">Premium</option>
+  </select>
+</div>
           <label for="regEmail">Email Address</label>
           <input type="email" id="regEmail" placeholder="you@example.com" required>
         </div>

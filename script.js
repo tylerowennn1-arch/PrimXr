@@ -447,7 +447,16 @@ interestWallet.textContent =
     console.error('Failed to parse active elements metrics context:', err);
   }
 }
+runSafe(() => {
+  const menuBtn = document.getElementById('menuBtn');
+  const sidebar = document.getElementById('sidebar');
 
+  if (menuBtn && sidebar) {
+    menuBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('active');
+    });
+  }
+});
 // --- Native Administrative Security Dashboard Loader ---
 async function loadAdminData() {
   const client = getSupabase();

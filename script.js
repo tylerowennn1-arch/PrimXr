@@ -394,7 +394,7 @@ async function loadDashboardData() {
   try {
     const initials = user.email.slice(0, 2).toUpperCase();
     const avatar = document.getElementById('userAvatar');
-    const userName = document.getElementById('userNameDisplay');
+    const userName = document.getElementById('userName');
     if (avatar) avatar.textContent = initials;
     
     const { data: profiles, error: profError } = await client

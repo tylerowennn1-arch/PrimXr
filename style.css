@@ -2401,3 +2401,17 @@ ul { list-style: none; }
   width: 100%;
 }
 
+.dash-card__value {
+  background: linear-gradient(45deg, #ffd700, #ffb800, #fff2a6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.sidebar {
+  transform: translateX(-100%);
+  transition: 0.3s;
+}
+
+.sidebar.active {
+  transform: translateX(0);
+}

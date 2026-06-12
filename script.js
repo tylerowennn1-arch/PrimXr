@@ -560,10 +560,9 @@ runSafe(() => {
 
 // --- BULLETPROOF PAGE INITIALIZATION HOOK ---
 runSafe(() => {
-  if (document.getElementById('dashBalance') || document.getElementById('transactionsBody')) {
+  if (document.getElementById('userNameDisplay')) {
     loadDashboardData();
   }
-
   if (document.getElementById('adminTransactionsBody')) {
     loadAdminData();
   }

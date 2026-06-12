@@ -302,7 +302,7 @@ runSafe(() => {
   profit: 0,
   tier: selectedTier
             }
-          ]);
+          ];
       // Check if email confirmation is required (prevents redirect loop)
       if (!data.session) {
         alert("Account created! Please check your email to confirm your account before logging in.");

@@ -381,6 +381,7 @@ runSafe(() => {
 
 // --- Native Dashboard SDK Performance Processing Engine ---
 async function loadDashboardData() {
+  console.log("loadDashboardData started");
   const client = getSupabase();
   if (!client) return;
 
@@ -403,6 +404,8 @@ async function loadDashboardData() {
       .eq('id', user.id)
       .single(); // Use single() if you expect one row
 
+    console.log(profiles);
+console.log(profError);
     if (profiles) {
       const profile = profiles;
       if (userName) {

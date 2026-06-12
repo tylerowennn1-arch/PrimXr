@@ -2402,14 +2402,19 @@ ul { list-style: none; }
 }
 
 .dash-card__value {
-  background: linear-gradient(45deg, #ffd700, #ffb800, #fff2a6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: gold !important;
 }
 
 .sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 260px;
+  background: #0a0a0f;
   transform: translateX(-100%);
-  transition: 0.3s;
+  transition: transform 0.3s ease;
+  z-index: 1000;
 }
 
 .sidebar.active {

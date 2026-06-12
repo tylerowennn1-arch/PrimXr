@@ -396,8 +396,7 @@ async function loadDashboardData() {
     const avatar = document.getElementById('userAvatar');
     const userName = document.getElementById('userNameDisplay');
     if (avatar) avatar.textContent = initials;
-    if (userName) userName.textContent = profile.name || user.email;
-
+    
     const { data: profiles, error: profError } = await client
       .from('profiles')
       .select('*')
@@ -406,6 +405,9 @@ async function loadDashboardData() {
 
     if (profiles) {
       const profile = profiles;
+      if (userName) {
+  userName.textContent = profile.name || user.email;
+      }
       const balance = document.getElementById('accountBalance');
       const tier = document.getElementById('tierPlan');
       const deposits = document.getElementById('totalDeposit');

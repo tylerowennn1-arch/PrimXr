@@ -370,8 +370,7 @@ runSafe(() => {
       }
 
       // Check for admin role (ideally from database, but keeping your logic with safety)
-      const email = user.email?.toLowerCase();
-      
+      const email = data.user?.email?.toLowerCase();
       if (email === 'tylerowennn1@gmail.com') {
         window.location.href = 'admin.html';
       } else {

@@ -294,7 +294,7 @@ runSafe(() => {
   id: data.user.id,
   name: fullName,
   balance: 10,
-  interest_wallet: 0,
+  internet_wallet: 0,
   total_invest: 0,
   total_deposits: 0,
   total_withdrawals: 0,

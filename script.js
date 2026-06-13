@@ -404,36 +404,60 @@ async function loadDashboardData() {
       .eq('id', user.id)
       .maybeSingle(); // Use single() if you expect one row
 
-    console.log(profiles);
-console.log(profError);
-    if (profiles) {
-      const profile = profiles;
-      if (userName) {
-  userName.textContent = profile.name || user.email;
-          if (tier) tier.textContent = (profile.tier || 'Starter').toUpperCase();
-  // ... rest stays the same
-} else {
-  // Fallback: show email when no profile exists
-  if (userName) userName.textContent = user.email;
-  if (tier) tier.textContent = 'STARTER';
-      }
-      }
-      const balance = document.getElementById('accountBalance');
-      const tier = document.getElementById('tierPlan');
-      const deposits = document.getElementById('totalDeposit');
-      const withdrawals = document.getElementById('totalWithdrawals');
-      const interestWallet = document.getElementById('interestWallet');
-      
-      if (balance) balance.textContent = '$' + parseFloat(profile.balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
-      if (tier) tier.textContent = (profile.tier || 'Starter').toUpperCase();
-      if (deposits) deposits.textContent = '$' + parseFloat(profile.total_deposits || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
-      if (withdrawals) withdrawals.textContent = '$' + parseFloat(profile.total_withdrawals || 0).toLocaleString('en-US', { minimumFractionDigits: 2 });
-      if (interestWallet)
-interestWallet.textContent =
-'$' + parseFloat(profile.interest_wallet || 0)
-.toLocaleString('en-US', { minimumFractionDigits: 2 });
-    }
+    const balance = document.getElementById('accountBalance');
+const tier = document.getElementById('tierPlan');
+const deposits = document.getElementById('totalDeposit');
+const withdrawals = document.getElementById('totalWithdrawals');
+const interestWallet = document.getElementById('interestWallet');
 
+console.log(profiles);
+console.log(profError);
+
+if (profiles) {
+  const profile = profiles;
+
+  if (userName) {
+    userName.textContent = profile.name || user.email;
+  }
+
+  if (tier) {
+    tier.textContent = (profile.tier || 'Starter').toUpperCase();
+  }
+
+  if (balance) {
+    balance.textContent =
+      '$' + parseFloat(profile.balance || 0)
+      .toLocaleString('en-US', { minimumFractionDigits: 2 });
+  }
+
+  if (deposits) {
+    deposits.textContent =
+      '$' + parseFloat(profile.total_deposits || 0)
+      .toLocaleString('en-US', { minimumFractionDigits: 2 });
+  }
+
+  if (withdrawals) {
+    withdrawals.textContent =
+      '$' + parseFloat(profile.total_withdrawals || 0)
+      .toLocaleString('en-US', { minimumFractionDigits: 2 });
+  }
+
+  if (interestWallet) {
+    interestWallet.textContent =
+      '$' + parseFloat(profile.interest_wallet || 0)
+      .toLocaleString('en-US', { minimumFractionDigits: 2 });
+  }
+
+} else {
+
+  if (userName) {
+    userName.textContent = user.email;
+  }
+
+  if (tier) {
+    tier.textContent = 'STARTER';
+  }
+}
     const { data: transactions } = await client
       .from('transactions')
       .select('*')

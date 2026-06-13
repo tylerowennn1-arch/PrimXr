@@ -402,7 +402,7 @@ async function loadDashboardData() {
       .from('profiles')
       .select('*')
       .eq('id', user.id)
-      . maybeSingle(); // Use single() if you expect one row
+      .maybeSingle(); // Use single() if you expect one row
 
     console.log(profiles);
 console.log(profError);

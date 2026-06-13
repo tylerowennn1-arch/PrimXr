@@ -402,7 +402,7 @@ async function loadDashboardData() {
       .from('profiles')
       .select('*')
       .eq('id', user.id)
-      .single(); // Use single() if you expect one row
+      . maybeSingle(); // Use single() if you expect one row
 
     console.log(profiles);
 console.log(profError);
@@ -410,6 +410,13 @@ console.log(profError);
       const profile = profiles;
       if (userName) {
   userName.textContent = profile.name || user.email;
+          if (tier) tier.textContent = (profile.tier || 'Starter').toUpperCase();
+  // ... rest stays the same
+} else {
+  // Fallback: show email when no profile exists
+  if (userName) userName.textContent = user.email;
+  if (tier) tier.textContent = 'STARTER';
+      }
       }
       const balance = document.getElementById('accountBalance');
       const tier = document.getElementById('tierPlan');

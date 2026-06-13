@@ -323,9 +323,7 @@ runSafe(() => {
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       
-  
-      
-      const email = document.getElementById('loginEmail').value;
+      const emailInput = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
       const btn = document.getElementById('loginBtn');
       
@@ -356,7 +354,7 @@ runSafe(() => {
       }
 
       const { data, error } = await client.auth.signInWithPassword({
-        email: email,
+        email: emailInput,
         password: password,
         options: signInOptions,
       });
@@ -369,9 +367,10 @@ runSafe(() => {
         return;
       }
 
-      // Check for admin role (ideally from database, but keeping your logic with safety)
-      const email = data.user?.email?.toLowerCase();
-      if (email === 'tylerowennn1@gmail.com') {
+      // FIX: Use data.user.email, not undefined 'user'
+      const userEmail = data.user?.email?.toLowerCase();
+      
+      if (userEmail === 'tylerowennn1@gmail.com') {
         window.location.href = 'admin.html';
       } else {
         window.location.href = 'dashboard.html';

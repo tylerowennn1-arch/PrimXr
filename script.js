@@ -302,7 +302,9 @@ runSafe(() => {
   profit: 0,
   tier: selectedTier
             }
-          ]);
+          ]
+          { onConflict: 'id' }
+        );
       }
       // Check if email confirmation is required (prevents redirect loop)
       if (!data.session) {

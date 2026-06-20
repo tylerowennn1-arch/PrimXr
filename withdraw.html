@@ -45,9 +45,11 @@
         <button class="dashboard__menu-btn" id="menuBtn">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
-        <div class="dashboard__header-right">
-          <div class="dashboard__user">
-            <span id="userEmailDisplay">loading...</span>
+        <div class="dashboard__user-profile">
+          <div id="userAvatar" class="dashboard__user-avatar"></div>
+          <div class="dashboard__user-details">
+            <div id="userName" class="dashboard__user-name">loading...</div>
+            <div id="userEmail" class="dashboard__user-email">loading...</div>
           </div>
         </div>
       </header>
@@ -104,6 +106,7 @@
   </div>
 
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
 </body>
 </html>

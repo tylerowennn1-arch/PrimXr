@@ -67,11 +67,36 @@
             </div>
           </div>
         </div>
+
+        <div class="dashboard__history-section" style="margin-top: 32px;">
+          <div class="dash-card">
+            <div class="table-header-row" style="margin-bottom: 16px;">
+              <h3 class="dash-card__title">User Accounts Balance Console</h3>
+            </div>
+            <div class="table-wrapper">
+              <table class="dash-table admin-table">
+                <thead>
+                  <tr>
+                    <th>Full Name</th>
+                    <th>User ID (UUID)</th>
+                    <th>Current Balance</th>
+                    <th>Selected Plan</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminUsersBody">
+                  <tr><td colspan="5" style="text-align:center;">Loading user profiles...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   </div>
 
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
 </body>
 </html>

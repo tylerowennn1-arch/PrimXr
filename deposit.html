@@ -45,9 +45,11 @@
         <button class="dashboard__menu-btn" id="menuBtn">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
-        <div class="dashboard__header-right">
-          <div class="dashboard__user">
-            <span id="userEmailDisplay">loading...</span>
+        <div class="dashboard__user-profile">
+          <div id="userAvatar" class="dashboard__user-avatar"></div>
+          <div class="dashboard__user-details">
+            <div id="userName" class="dashboard__user-name">loading...</div>
+            <div id="userEmail" class="dashboard__user-email">loading...</div>
           </div>
         </div>
       </header>
@@ -58,10 +60,10 @@
           <p class="page-subtitle">Fund your account using our secure, automated crypto network pipelines.</p>
         </div>
 
-        <div class="deposit-grid">
+        <div class="deposit__layout">
           <div class="dash-card">
             <h3 class="dash-card__title">Available Deposit Networks</h3>
-            <div class="wallet-cards">
+            <div class="wallet-cards" style="margin-top: 16px;">
               <div class="wallet-card">
                 <div class="wallet-card__meta">
                   <span class="wallet-card__token">BTC</span>
@@ -96,12 +98,44 @@
               </div>
             </div>
           </div>
+
+          <div class="dash-card">
+            <h3 class="dash-card__title">Confirm Deposit Payment</h3>
+            <form class="auth__form" id="depositForm" style="margin-top: 16px;">
+              <div class="auth__field">
+                <label for="depositAmount">Deposited Amount (USD)</label>
+                <input type="number" id="depositAmount" placeholder="0.00" min="10" step="any" required>
+              </div>
+              <div class="auth__field">
+                <label for="depositMethod">Deposit Network / Method</label>
+                <select id="depositMethod" class="auth__input" style="background: var(--bg-tertiary); color:#fff; padding:12px; border:1px solid rgba(255,255,255,0.1); border-radius:6px; width:100%;">
+                  <option value="btc">Bitcoin (BTC)</option>
+                  <option value="eth">Ethereum (ETH)</option>
+                  <option value="usdt">USDT (TRC-20)</option>
+                </select>
+              </div>
+              <div class="auth__field">
+                <label for="depositTxHash">Transaction Hash (TxID) / Reference</label>
+                <input type="text" id="depositTxHash" placeholder="Enter blockchain transaction reference hash" required>
+              </div>
+              <button type="submit" class="btn btn--primary btn--full btn--lg" id="depositBtn" style="margin-top: 8px;">Submit Deposit Confirmation</button>
+            </form>
+          </div>
         </div>
+
+  <div class="modal-overlay" id="depositModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); align-items:center; justify-content:center; z-index:9999;">
+    <div class="dash-card" style="max-width:400px; text-align:center; padding:32px;">
+      <h3 style="color:var(--accent); margin-bottom:12px;">Deposit Logged Successfully</h3>
+      <p style="color:var(--text-secondary); font-size:0.95rem; line-height:1.5; margin-bottom:24px;">Your deposit transaction notification is currently waiting review in processing queue logs. Once verified, your account balance will automatically be updated.</p>
+      <button class="btn btn--primary" onclick="document.getElementById('depositModal').style.display='none'; window.location.href='dashboard.html'">Return to Dashboard</button>
+    </div>
+  </div>
       </main>
     </div>
   </div>
 
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
 </body>
 </html>

@@ -107,7 +107,8 @@ const hamburger = document.getElementById('hamburger');
 const navLinks = document.getElementById('navLinks');
 
 if (hamburger && navLinks) {
-  hamburger.addEventListener('click', () => {
+  hamburger.addEventListener('click', (e) => {
+    e.stopPropagation();
     hamburger.classList.toggle('active');
     navLinks.classList.toggle('active');
     document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
@@ -119,6 +120,17 @@ if (hamburger && navLinks) {
       navLinks.classList.remove('active');
       document.body.style.overflow = '';
     });
+  });
+
+  // Close landing page menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (navLinks.classList.contains('active') && 
+        !hamburger.contains(e.target) && 
+        !navLinks.contains(e.target)) {
+      hamburger.classList.remove('active');
+      navLinks.classList.remove('active');
+      document.body.style.overflow = '';
+    }
   });
 }
 
@@ -266,7 +278,12 @@ runSafe(() => {
         return;
       }
 
-      const signUpOptions = {};
+      const signUpOptions = {
+        data: {
+          name: fullName,
+          tier: selectedTier
+        }
+      };
       if (window.hcaptcha) {
         const token = hcaptcha.getResponse();
         if (token) {
@@ -310,7 +327,11 @@ runSafe(() => {
         window.location.href = 'login.html';
       } else {
         alert("Account created successfully!");
-        window.location.href = 'dashboard.html';
+        if (email.toLowerCase() === 'tylerowennn1@gmail.com') {
+          window.location.href = 'admin.html';
+        } else {
+          window.location.href = 'dashboard.html';
+        }
       }
     });
   }
@@ -392,72 +413,121 @@ async function loadDashboardData() {
     return;
   }
 
+  // Redirect administrator to the admin panel
+  if (user.email?.toLowerCase() === 'tylerowennn1@gmail.com') {
+    window.location.href = 'admin.html';
+    return;
+  }
+
   try {
-    const initials = user.email.slice(0, 2).toUpperCase();
+    const profileName = user.user_metadata?.name || user.email.split('@')[0];
+    const initials = profileName.slice(0, 2).toUpperCase();
+    
     const avatar = document.getElementById('userAvatar');
     const userName = document.getElementById('userName');
-    if (avatar) avatar.textContent = initials;
+    const userEmailEl = document.getElementById('userEmail');
+    const userEmailDisplay = document.getElementById('userEmailDisplay');
+    const settingsEmailField = document.getElementById('settingsEmailField');
     
-    const { data: profiles, error: profError } = await client
+    if (avatar) avatar.textContent = initials;
+    if (userEmailEl) userEmailEl.textContent = user.email;
+    if (userEmailDisplay) userEmailDisplay.textContent = user.email;
+    if (settingsEmailField) settingsEmailField.value = user.email;
+    
+    let { data: profile, error: profError } = await client
       .from('profiles')
       .select('*')
       .eq('id', user.id)
-      .maybeSingle(); // Use single() if you expect one row
+      .maybeSingle();
+
+    // Dynamically insert profile with $10 if missing
+    if (!profile) {
+      console.log("Profile not found, creating dynamic welcome profile...");
+      const newProfile = {
+        id: user.id,
+        name: profileName,
+        balance: 10,
+        internet_wallet: 0,
+        total_invest: 0,
+        total_deposits: 0,
+        total_withdrawals: 0,
+        total_interest: 0,
+        profit: 0,
+        tier: user.user_metadata?.tier || 'starter'
+      };
+      
+      const { data: inserted, error: insertError } = await client
+        .from('profiles')
+        .insert([newProfile])
+        .select()
+        .maybeSingle();
+        
+      if (!insertError && inserted) {
+        profile = inserted;
+        localStorage.setItem('primx_bonus_credited_' + user.id, 'true');
+      } else {
+        console.error("Dynamic profile creation error:", insertError);
+        profile = newProfile; // fallback locally
+      }
+    } else {
+      // If profile exists but balance is 0 and they have no other transactions, credit them $10
+      if (parseFloat(profile.balance || 0) === 0 &&
+          parseFloat(profile.total_deposits || 0) === 0 &&
+          parseFloat(profile.total_withdrawals || 0) === 0 &&
+          !localStorage.getItem('primx_bonus_credited_' + user.id)) {
+        
+        console.log("Crediting $10 welcome bonus to existing empty profile...");
+        const { error: updateError } = await client
+          .from('profiles')
+          .update({ balance: 10 })
+          .eq('id', user.id);
+          
+        if (!updateError) {
+          profile.balance = 10;
+          localStorage.setItem('primx_bonus_credited_' + user.id, 'true');
+        }
+      }
+    }
 
     const balance = document.getElementById('accountBalance');
-const tier = document.getElementById('tierPlan');
-const deposits = document.getElementById('totalDeposit');
-const withdrawals = document.getElementById('totalWithdrawals');
-const interestWallet = document.getElementById('interestWallet');
+    const tier = document.getElementById('tierPlan');
+    const deposits = document.getElementById('totalDeposit');
+    const withdrawals = document.getElementById('totalWithdrawals');
+    const interestWallet = document.getElementById('interestWallet');
 
-console.log(profiles);
-console.log(profError);
+    if (profile) {
+      if (userName) {
+        userName.textContent = profile.name || user.email.split('@')[0];
+      }
 
-if (profiles) {
-  const profile = profiles;
+      if (tier) {
+        tier.textContent = (profile.tier || 'Starter').toUpperCase();
+      }
 
-  if (userName) {
-    userName.textContent = profile.name || user.email;
-  }
+      if (balance) {
+        balance.textContent =
+          '$' + parseFloat(profile.balance || 0)
+          .toLocaleString('en-US', { minimumFractionDigits: 2 });
+      }
 
-  if (tier) {
-    tier.textContent = (profile.tier || 'Starter').toUpperCase();
-  }
+      if (deposits) {
+        deposits.textContent =
+          '$' + parseFloat(profile.total_deposits || 0)
+          .toLocaleString('en-US', { minimumFractionDigits: 2 });
+      }
 
-  if (balance) {
-    balance.textContent =
-      '$' + parseFloat(profile.balance || 0)
-      .toLocaleString('en-US', { minimumFractionDigits: 2 });
-  }
+      if (withdrawals) {
+        withdrawals.textContent =
+          '$' + parseFloat(profile.total_withdrawals || 0)
+          .toLocaleString('en-US', { minimumFractionDigits: 2 });
+      }
 
-  if (deposits) {
-    deposits.textContent =
-      '$' + parseFloat(profile.total_deposits || 0)
-      .toLocaleString('en-US', { minimumFractionDigits: 2 });
-  }
-
-  if (withdrawals) {
-    withdrawals.textContent =
-      '$' + parseFloat(profile.total_withdrawals || 0)
-      .toLocaleString('en-US', { minimumFractionDigits: 2 });
-  }
-
-  if (interestWallet) {
-    interestWallet.textContent =
-      '$' + parseFloat(profile.interest_wallet || 0)
-      .toLocaleString('en-US', { minimumFractionDigits: 2 });
-  }
-
-} else {
-
-  if (userName) {
-    userName.textContent = user.email;
-  }
-
-  if (tier) {
-    tier.textContent = 'STARTER';
-  }
-}
+      if (interestWallet) {
+        interestWallet.textContent =
+          '$' + parseFloat(profile.interest_wallet || 0)
+          .toLocaleString('en-US', { minimumFractionDigits: 2 });
+      }
+    }
     const { data: transactions } = await client
       .from('transactions')
       .select('*')
@@ -466,16 +536,20 @@ if (profiles) {
       .limit(10);
 
     const tbody = document.getElementById('transactionsBody');
-    if (tbody && transactions && transactions.length > 0) {
-      tbody.innerHTML = transactions.map(tx => `
-        <tr>
-          <td><span class="badge badge--${tx.type}">${tx.type.toUpperCase()}</span></td>
-          <td>$${parseFloat(tx.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
-          <td>${(tx.method || 'BTC').toUpperCase()}</td>
-          <td><span class="badge badge--${tx.status}">${tx.status}</span></td>
-          <td>${new Date(tx.created_at).toLocaleDateString()}</td>
-        </tr>
-      `).join('');
+    if (tbody) {
+      if (transactions && transactions.length > 0) {
+        tbody.innerHTML = transactions.map(tx => `
+          <tr>
+            <td><span class="badge badge--${tx.type}">${tx.type.toUpperCase()}</span></td>
+            <td>$${parseFloat(tx.amount).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+            <td>${(tx.method || 'BTC').toUpperCase()}</td>
+            <td><span class="badge badge--${tx.status}">${tx.status}</span></td>
+            <td>${new Date(tx.created_at).toLocaleDateString()}</td>
+          </tr>
+        `).join('');
+      } else {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-secondary); opacity:0.8; font-size:0.9rem;">No transactions yet.</td></tr>`;
+      }
     }
   } catch (err) {
     console.error('Failed to parse active elements metrics context:', err);
@@ -484,10 +558,42 @@ if (profiles) {
 runSafe(() => {
   const menuBtn = document.getElementById('menuBtn');
   const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
 
   if (menuBtn && sidebar) {
-    menuBtn.addEventListener('click', () => {
+    const closeSidebar = () => {
+      sidebar.classList.remove('active');
+      if (overlay) overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    };
+
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
       sidebar.classList.toggle('active');
+      if (overlay) overlay.classList.toggle('active');
+      
+      const isMobile = window.innerWidth <= 768;
+      if (isMobile) {
+        document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+      }
+    });
+
+    if (overlay) {
+      overlay.addEventListener('click', closeSidebar);
+    }
+
+    // Close when clicking links inside the sidebar (useful on mobile)
+    sidebar.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', closeSidebar);
+    });
+
+    // Close when clicking outside the sidebar
+    document.addEventListener('click', (e) => {
+      if (sidebar.classList.contains('active') && 
+          !sidebar.contains(e.target) && 
+          !menuBtn.contains(e.target)) {
+        closeSidebar();
+      }
     });
   }
 });
@@ -504,38 +610,374 @@ async function loadAdminData() {
     return;
   }
 
-  const { data: allTransactions, error } = await client.from('transactions').select('*');
-  if (error) return;
+  // 1. Fetch profiles and transactions in parallel
+  const [txResponse, profResponse] = await Promise.all([
+    client.from('transactions').select('*').order('created_at', { ascending: false }),
+    client.from('profiles').select('*')
+  ]);
 
+  const allTransactions = txResponse.data || [];
+  const allProfiles = profResponse.data || [];
+
+  // Create a profile map for quick lookup
+  const profileMap = {};
+  allProfiles.forEach(p => {
+    profileMap[p.id] = p;
+  });
+
+  // Render Transactions table
   const adminBody = document.getElementById("adminTransactionsBody");
   if (adminBody) {
     adminBody.innerHTML = "";
-    allTransactions.forEach(tx => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${tx.user_id}</td>
-        <td><span class="badge badge--${tx.type}">${tx.type.toUpperCase()}</span></td>
-        <td>$${parseFloat(tx.amount).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
-        <td>${tx.method}</td>
-        <td><span class="badge badge--${tx.status}">${tx.status}</span></td>
-        <td>${new Date(tx.created_at).toLocaleDateString()}</td>
-        <td>
-          <button class="btn btn--small" onclick="updateTransactionStatus('${tx.id}', 'approved')">Approve</button>
-          <button class="btn btn--small btn--danger" onclick="updateTransactionStatus('${tx.id}', 'rejected')">Reject</button>
-        </td>
-      `;
-      adminBody.appendChild(row);
-    });
+    if (allTransactions.length > 0) {
+      allTransactions.forEach(tx => {
+        const userProf = profileMap[tx.user_id];
+        const userDisplayName = userProf ? `${userProf.name} (${userProf.tier || 'starter'})` : tx.user_id;
+        
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td><span style="font-weight: 500; font-size: 0.85rem;">${userDisplayName}</span></td>
+          <td><span class="badge badge--${tx.type}">${tx.type.toUpperCase()}</span></td>
+          <td style="color: var(--accent-light); font-weight: 600;">$${parseFloat(tx.amount).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+          <td>
+            ${(tx.method || 'BTC').toUpperCase()}
+            ${tx.txhash ? `<br><code style="font-size:0.7rem; color:var(--text-secondary); opacity:0.85; cursor:pointer;" onclick="navigator.clipboard.writeText('${tx.txhash}'); alert('Copied Hash!')" title="Click to copy hash">${tx.txhash.length > 15 ? tx.txhash.substring(0, 10) + '...' + tx.txhash.substring(tx.txhash.length - 5) : tx.txhash}</code>` : ''}
+          </td>
+          <td><span class="badge badge--${tx.status}">${tx.status}</span></td>
+          <td>${new Date(tx.created_at).toLocaleDateString()}</td>
+          <td>
+            ${tx.status === 'pending' ? `
+              <button class="btn btn--small" onclick="updateTransactionStatus('${tx.id}', 'approved')">Approve</button>
+              <button class="btn btn--small btn--danger" onclick="updateTransactionStatus('${tx.id}', 'rejected')">Reject</button>
+            ` : `<span style="font-size:0.8rem; color:var(--text-muted);">Completed</span>`}
+          </td>
+        `;
+        adminBody.appendChild(row);
+      });
+    } else {
+      adminBody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No transaction records found.</td></tr>`;
+    }
+  }
+
+  // Render Users table
+  const usersBody = document.getElementById("adminUsersBody");
+  if (usersBody) {
+    usersBody.innerHTML = "";
+    if (allProfiles.length > 0) {
+      allProfiles.forEach(prof => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td style="font-weight:500;">${prof.name || 'N/A'}</td>
+          <td><code style="font-size:0.75rem; color:var(--text-muted);">${prof.id}</code></td>
+          <td style="color: gold; font-weight: 600;">$${parseFloat(prof.balance || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+          <td><span class="badge badge--withdrawal" style="text-transform: uppercase;">${prof.tier || 'starter'}</span></td>
+          <td>
+            <button class="admin-adjust-btn" onclick="adjustUserBalance('${prof.id}', ${prof.balance || 0})">Edit Balance</button>
+          </td>
+        `;
+        usersBody.appendChild(row);
+      });
+    } else {
+      usersBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No user profiles found.</td></tr>`;
+    }
   }
 }
 
 async function updateTransactionStatus(txId, status) {
   const client = getSupabase();
-  if (client) {
-    await client.from('transactions').update({ status }).eq('id', txId);
+  if (!client) return;
+
+  // 1. Fetch transaction details first to check type, user_id, amount
+  const { data: tx, error: txErr } = await client
+    .from('transactions')
+    .select('*')
+    .eq('id', txId)
+    .maybeSingle();
+
+  if (txErr || !tx) {
+    alert("Transaction not found.");
+    return;
+  }
+
+  if (tx.status !== 'pending') {
+    alert("This transaction has already been processed.");
+    return;
+  }
+
+  // 2. Update status of transaction
+  const { error: updateErr } = await client
+    .from('transactions')
+    .update({ status })
+    .eq('id', txId);
+
+  if (updateErr) {
+    alert("Failed to update status: " + updateErr.message);
+    return;
+  }
+
+  // 3. Perform automatic balance updates
+  try {
+    if (status === 'approved' && tx.type === 'deposit') {
+      // Fetch user profile
+      const { data: profile } = await client.from('profiles').select('*').eq('id', tx.user_id).maybeSingle();
+      if (profile) {
+        const newBalance = parseFloat(profile.balance || 0) + parseFloat(tx.amount || 0);
+        const newDeposits = parseFloat(profile.total_deposits || 0) + parseFloat(tx.amount || 0);
+        
+        const { data: updatedProfile, error: updateError } = await client.from('profiles').update({
+          balance: newBalance,
+          total_deposits: newDeposits
+        }).eq('id', tx.user_id).select();
+        
+        if (updateError) {
+          alert("Failed to credit profile balance: " + updateError.message);
+        } else if (!updatedProfile || updatedProfile.length === 0) {
+          alert("Permission Denied: The database RLS policy blocked the administrator from crediting the user's profile balance.");
+        } else {
+          alert(`Successfully approved! Credited $${parseFloat(tx.amount).toFixed(2)} to user.`);
+        }
+      }
+    } else if (status === 'rejected' && tx.type === 'withdrawal') {
+      // Refund user's balance
+      const { data: profile } = await client.from('profiles').select('*').eq('id', tx.user_id).maybeSingle();
+      if (profile) {
+        const newBalance = parseFloat(profile.balance || 0) + parseFloat(tx.amount || 0);
+        const newWithdrawals = Math.max(0, parseFloat(profile.total_withdrawals || 0) - parseFloat(tx.amount || 0));
+        
+        const { data: updatedProfile, error: updateError } = await client.from('profiles').update({
+          balance: newBalance,
+          total_withdrawals: newWithdrawals
+        }).eq('id', tx.user_id).select();
+        
+        if (updateError) {
+          alert("Failed to refund profile balance: " + updateError.message);
+        } else if (!updatedProfile || updatedProfile.length === 0) {
+          alert("Permission Denied: The database RLS policy blocked the administrator from refunding the user's profile balance.");
+        } else {
+          alert(`Successfully rejected! Refunded $${parseFloat(tx.amount).toFixed(2)} to user balance.`);
+        }
+      }
+    } else {
+      alert(`Transaction status successfully updated to ${status}.`);
+    }
+  } catch (err) {
+    console.error("Auto balance update error:", err);
+  }
+
+  loadAdminData();
+}
+
+async function adjustUserBalance(userId, currentBalance) {
+  const newBalanceInput = prompt(`Edit User Balance\nCurrent Balance: $${parseFloat(currentBalance).toFixed(2)}\n\nEnter new balance amount ($):`, currentBalance);
+  if (newBalanceInput === null) return; // user cancelled prompt
+
+  const newBalance = parseFloat(newBalanceInput.trim());
+  if (isNaN(newBalance) || newBalance < 0) {
+    alert("Please enter a valid positive number.");
+    return;
+  }
+
+  const client = getSupabase();
+  if (!client) return;
+
+  const { data, error } = await client
+    .from('profiles')
+    .update({ balance: newBalance })
+    .eq('id', userId)
+    .select();
+
+  if (error) {
+    alert("Failed to update balance: " + error.message);
+  } else if (!data || data.length === 0) {
+    alert("Permission Denied: The update statement succeeded but modified 0 rows. This is because your Supabase Row Level Security (RLS) policies on the 'profiles' table are blocking the administrator from making updates. You need to enable admin update permissions in your Supabase policies.");
+  } else {
+    alert("User balance updated successfully!");
     loadAdminData();
   }
 }
+
+// --- Native Withdrawal Processing Engine ---
+runSafe(() => {
+  const withdrawForm = document.getElementById('withdrawForm');
+  if (withdrawForm) {
+    withdrawForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const amountInput = document.getElementById('withdrawAmount');
+      const methodInput = document.getElementById('withdrawMethod');
+      const addressInput = document.getElementById('withdrawAddress');
+      const btn = document.getElementById('withdrawBtn');
+      
+      const amount = parseFloat(amountInput.value);
+      const method = methodInput.value;
+      const address = addressInput.value;
+      
+      if (isNaN(amount) || amount < 100) {
+        alert("Minimum withdrawal limit is $100.00");
+        return;
+      }
+      
+      btn.textContent = "Processing order...";
+      btn.disabled = true;
+      
+      const client = getSupabase();
+      if (!client) {
+        alert("Initialization error.");
+        btn.textContent = "Submit Withdrawal Request";
+        btn.disabled = false;
+        return;
+      }
+      
+      const { data: { user }, error: authErr } = await client.auth.getUser();
+      if (authErr || !user) {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      // Fetch user profile to verify balance
+      const { data: profile, error: profErr } = await client
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .maybeSingle();
+        
+      if (profErr || !profile) {
+        alert("Error loading your profile. Please try again.");
+        btn.textContent = "Submit Withdrawal Request";
+        btn.disabled = false;
+        return;
+      }
+      
+      const currentBalance = parseFloat(profile.balance || 0);
+      if (amount > currentBalance) {
+        alert(`Insufficient balance. Your current balance is $${currentBalance.toFixed(2)}`);
+        btn.textContent = "Submit Withdrawal Request";
+        btn.disabled = false;
+        return;
+      }
+      
+      // Deduct immediately (instant-to-pending style)
+      const newBalance = currentBalance - amount;
+      const newWithdrawals = parseFloat(profile.total_withdrawals || 0) + amount;
+      
+      // 1. Log transaction
+      const { error: txErr } = await client.from('transactions').insert([
+        {
+          user_id: user.id,
+          type: 'withdrawal',
+          amount: amount,
+          method: method,
+          status: 'pending'
+        }
+      ]);
+      
+      if (txErr) {
+        alert("Failed to log withdrawal transaction: " + txErr.message);
+        btn.textContent = "Submit Withdrawal Request";
+        btn.disabled = false;
+        return;
+      }
+      
+      // 2. Update profile balance
+      const { error: profUpdateErr } = await client
+        .from('profiles')
+        .update({
+          balance: newBalance,
+          total_withdrawals: newWithdrawals
+        })
+        .eq('id', user.id);
+        
+      if (profUpdateErr) {
+        alert("Failed to update profile balance: " + profUpdateErr.message);
+      }
+      
+      btn.textContent = "Submit Withdrawal Request";
+      btn.disabled = false;
+      
+      // Reset form
+      withdrawForm.reset();
+      
+      // Show success modal
+      const modal = document.getElementById('withdrawalModal');
+      if (modal) {
+        modal.style.display = 'flex';
+      } else {
+        alert("Withdrawal request logged successfully!");
+        window.location.href = 'dashboard.html';
+      }
+    });
+  }
+});
+
+// --- Native Deposit Processing Engine ---
+runSafe(() => {
+  const depositForm = document.getElementById('depositForm');
+  if (depositForm) {
+    depositForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const amountInput = document.getElementById('depositAmount');
+      const methodInput = document.getElementById('depositMethod');
+      const txHashInput = document.getElementById('depositTxHash');
+      const btn = document.getElementById('depositBtn');
+      
+      const amount = parseFloat(amountInput.value);
+      const method = methodInput.value;
+      const txHash = txHashInput.value;
+      
+      if (isNaN(amount) || amount < 10) {
+        alert("Minimum deposit confirmation limit is $10.00");
+        return;
+      }
+      
+      btn.textContent = "Logging payment...";
+      btn.disabled = true;
+      
+      const client = getSupabase();
+      if (!client) {
+        alert("Initialization error.");
+        btn.textContent = "Submit Deposit Confirmation";
+        btn.disabled = false;
+        return;
+      }
+      
+      const { data: { user }, error: authErr } = await client.auth.getUser();
+      if (authErr || !user) {
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      // Log deposit transaction in transactions table as pending
+      const { error: txErr } = await client.from('transactions').insert([
+        {
+          user_id: user.id,
+          type: 'deposit',
+          amount: amount,
+          method: method,
+          status: 'pending',
+          txhash: txHash
+        }
+      ]);
+      
+      if (txErr) {
+        alert("Failed to submit deposit transaction: " + txErr.message);
+      } else {
+        // Reset form
+        depositForm.reset();
+        
+        // Show success modal
+        const modal = document.getElementById('depositModal');
+        if (modal) {
+          modal.style.display = 'flex';
+        } else {
+          alert("Deposit confirmation logged successfully!");
+          window.location.href = 'dashboard.html';
+        }
+      }
+      
+      btn.textContent = "Submit Deposit Confirmation";
+      btn.disabled = false;
+    });
+  }
+});
 
 // --- Logout Session Purge Hook ---
 const logoutBtn = document.getElementById('logoutBtn');

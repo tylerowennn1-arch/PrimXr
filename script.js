@@ -317,7 +317,8 @@ runSafe(() => {
   total_withdrawals: 0,
   total_interest: 0,
   profit: 0,
-  tier: selectedTier
+  tier: selectedTier,
+  status: 'active'
             }
           ]);
       }
@@ -388,6 +389,24 @@ runSafe(() => {
         return;
       }
 
+      // Check if suspended
+      if (data.user) {
+        const { data: profile, error: profError } = await client
+          .from('profiles')
+          .select('status')
+          .eq('id', data.user.id)
+          .maybeSingle();
+
+        if (profile && profile.status === 'suspended') {
+          alert("Your account has been suspended. Please contact support.");
+          await client.auth.signOut();
+          btn.textContent = 'Sign In';
+          btn.disabled = false;
+          if (window.hcaptcha) hcaptcha.reset();
+          return;
+        }
+      }
+
       // FIX: Use data.user.email, not undefined 'user'
       const userEmail = data.user?.email?.toLowerCase();
       
@@ -440,6 +459,13 @@ async function loadDashboardData() {
       .eq('id', user.id)
       .maybeSingle();
 
+    if (profile && profile.status === 'suspended') {
+      alert("Your account has been suspended. Please contact support.");
+      await client.auth.signOut();
+      window.location.href = 'login.html';
+      return;
+    }
+
     // Dynamically insert profile with $10 if missing
     if (!profile) {
       console.log("Profile not found, creating dynamic welcome profile...");
@@ -453,7 +479,8 @@ async function loadDashboardData() {
         total_withdrawals: 0,
         total_interest: 0,
         profit: 0,
-        tier: user.user_metadata?.tier || 'starter'
+        tier: user.user_metadata?.tier || 'starter',
+        status: 'active'
       };
       
       const { data: inserted, error: insertError } = await client
@@ -598,6 +625,8 @@ runSafe(() => {
   }
 });
 // --- Native Administrative Security Dashboard Loader ---
+let adminProfilesList = [];
+
 async function loadAdminData() {
   const client = getSupabase();
   if (!client) return;
@@ -618,6 +647,7 @@ async function loadAdminData() {
 
   const allTransactions = txResponse.data || [];
   const allProfiles = profResponse.data || [];
+  adminProfilesList = allProfiles;
 
   // Create a profile map for quick lookup
   const profileMap = {};
@@ -665,14 +695,15 @@ async function loadAdminData() {
     usersBody.innerHTML = "";
     if (allProfiles.length > 0) {
       allProfiles.forEach(prof => {
+        const suspendedBadge = prof.status === 'suspended' ? ` <span class="badge badge--rejected" style="margin-left: 8px;">Suspended</span>` : '';
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td style="font-weight:500;">${prof.name || 'N/A'}</td>
+          <td style="font-weight:500;">${prof.name || 'N/A'}${suspendedBadge}</td>
           <td><code style="font-size:0.75rem; color:var(--text-muted);">${prof.id}</code></td>
           <td style="color: gold; font-weight: 600;">$${parseFloat(prof.balance || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
           <td><span class="badge badge--withdrawal" style="text-transform: uppercase;">${prof.tier || 'starter'}</span></td>
           <td>
-            <button class="admin-adjust-btn" onclick="adjustUserBalance('${prof.id}', ${prof.balance || 0})">Edit Balance</button>
+            <button class="admin-adjust-btn" onclick="openUserManagerModal('${prof.id}')">Manage User</button>
           </td>
         `;
         usersBody.appendChild(row);
@@ -767,34 +798,103 @@ async function updateTransactionStatus(txId, status) {
   loadAdminData();
 }
 
-async function adjustUserBalance(userId, currentBalance) {
-  const newBalanceInput = prompt(`Edit User Balance\nCurrent Balance: $${parseFloat(currentBalance).toFixed(2)}\n\nEnter new balance amount ($):`, currentBalance);
-  if (newBalanceInput === null) return; // user cancelled prompt
-
-  const newBalance = parseFloat(newBalanceInput.trim());
-  if (isNaN(newBalance) || newBalance < 0) {
-    alert("Please enter a valid positive number.");
+function openUserManagerModal(userId) {
+  const profile = adminProfilesList.find(p => p.id === userId);
+  if (!profile) {
+    alert("User profile not found in local cache.");
     return;
   }
+  
+  document.getElementById("editUserId").value = profile.id;
+  document.getElementById("editUserName").value = profile.name || "";
+  document.getElementById("editUserTier").value = (profile.tier || "starter").toLowerCase();
+  document.getElementById("editUserBalance").value = profile.balance || 0;
+  document.getElementById("editUserWallet").value = profile.internet_wallet || 0;
+  document.getElementById("editUserInvest").value = profile.total_invest || 0;
+  document.getElementById("editUserDeposits").value = profile.total_deposits || 0;
+  document.getElementById("editUserWithdrawals").value = profile.total_withdrawals || 0;
+  document.getElementById("editUserInterest").value = profile.total_interest || 0;
+  document.getElementById("editUserProfit").value = profile.profit || 0;
+  
+  const suspendedCheckbox = document.getElementById("editUserSuspended");
+  if (suspendedCheckbox) {
+    suspendedCheckbox.checked = profile.status === 'suspended';
+  }
+  
+  const modal = document.getElementById("userManagerModal");
+  if (modal) {
+    modal.classList.add("active");
+  }
+}
 
+function closeUserManagerModal() {
+  const modal = document.getElementById("userManagerModal");
+  if (modal) {
+    modal.classList.remove("active");
+  }
+}
+
+async function saveUserProfile() {
+  const userId = document.getElementById("editUserId").value;
+  if (!userId) return;
+  
+  const name = document.getElementById("editUserName").value;
+  const tier = document.getElementById("editUserTier").value;
+  const balance = parseFloat(document.getElementById("editUserBalance").value) || 0;
+  const internet_wallet = parseFloat(document.getElementById("editUserWallet").value) || 0;
+  const total_invest = parseFloat(document.getElementById("editUserInvest").value) || 0;
+  const total_deposits = parseFloat(document.getElementById("editUserDeposits").value) || 0;
+  const total_withdrawals = parseFloat(document.getElementById("editUserWithdrawals").value) || 0;
+  const total_interest = parseFloat(document.getElementById("editUserInterest").value) || 0;
+  const profit = parseFloat(document.getElementById("editUserProfit").value) || 0;
+  
+  const suspendedCheckbox = document.getElementById("editUserSuspended");
+  const status = (suspendedCheckbox && suspendedCheckbox.checked) ? 'suspended' : 'active';
+  
+  const saveBtn = document.getElementById("saveUserBtn");
+  const originalText = saveBtn.textContent;
+  saveBtn.textContent = "Saving...";
+  saveBtn.disabled = true;
+  
   const client = getSupabase();
-  if (!client) return;
-
+  if (!client) {
+    alert("Supabase client not initialized.");
+    saveBtn.textContent = originalText;
+    saveBtn.disabled = false;
+    return;
+  }
+  
   const { data, error } = await client
     .from('profiles')
-    .update({ balance: newBalance })
+    .update({
+      name,
+      tier,
+      balance,
+      internet_wallet,
+      total_invest,
+      total_deposits,
+      total_withdrawals,
+      total_interest,
+      profit,
+      status
+    })
     .eq('id', userId)
     .select();
-
+    
+  saveBtn.textContent = originalText;
+  saveBtn.disabled = false;
+  
   if (error) {
-    alert("Failed to update balance: " + error.message);
+    alert("Failed to update profile: " + error.message);
   } else if (!data || data.length === 0) {
-    alert("Permission Denied: The update statement succeeded but modified 0 rows. This is because your Supabase Row Level Security (RLS) policies on the 'profiles' table are blocking the administrator from making updates. You need to enable admin update permissions in your Supabase policies.");
+    alert("Permission Denied: The update statement succeeded but modified 0 rows. Verify your Supabase RLS policies on the 'profiles' table.");
   } else {
-    alert("User balance updated successfully!");
+    alert("User profile updated successfully!");
+    closeUserManagerModal();
     loadAdminData();
   }
 }
+
 
 // --- Native Withdrawal Processing Engine ---
 runSafe(() => {

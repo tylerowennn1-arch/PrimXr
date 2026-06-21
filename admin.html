@@ -71,7 +71,7 @@
         <div class="dashboard__history-section" style="margin-top: 32px;">
           <div class="dash-card">
             <div class="table-header-row" style="margin-bottom: 16px;">
-              <h3 class="dash-card__title">User Accounts Balance Console</h3>
+              <h3 class="dash-card__title">User Accounts Management Console</h3>
             </div>
             <div class="table-wrapper">
               <table class="dash-table admin-table">
@@ -92,6 +92,81 @@
           </div>
         </div>
       </main>
+    </div>
+  </div>
+
+  <!-- User Profile Management Modal -->
+  <div class="admin-modal-overlay" id="userManagerModal">
+    <div class="admin-modal-card">
+      <div class="admin-modal-header">
+        <h3 class="admin-modal-title">Manage User Profile</h3>
+        <button class="admin-modal-close" onclick="closeUserManagerModal()">&times;</button>
+      </div>
+      <div class="admin-modal-body">
+        <form id="editUserForm" onsubmit="event.preventDefault();">
+          <input type="hidden" id="editUserId">
+          <div class="admin-form-grid">
+            <div class="admin-form-group admin-form-group--full">
+              <label for="editUserName">Full Name</label>
+              <input type="text" id="editUserName" class="admin-input" required placeholder="User's Full Name">
+            </div>
+            
+            <div class="admin-form-group">
+              <label for="editUserTier">Selected Plan / Tier</label>
+              <select id="editUserTier" class="admin-select-field" required>
+                <option value="starter">Starter</option>
+                <option value="basic">Basic</option>
+                <option value="standard">Standard</option>
+                <option value="premium">Premium</option>
+              </select>
+            </div>
+            
+            <div class="admin-form-group">
+              <label for="editUserBalance">Current Balance ($)</label>
+              <input type="number" step="any" id="editUserBalance" class="admin-input" required min="0" placeholder="0.00">
+            </div>
+            
+            <div class="admin-form-group">
+              <label for="editUserWallet">Internet Wallet ($)</label>
+              <input type="number" step="any" id="editUserWallet" class="admin-input" required min="0" placeholder="0.00">
+            </div>
+            
+            <div class="admin-form-group">
+              <label for="editUserInvest">Total Invested ($)</label>
+              <input type="number" step="any" id="editUserInvest" class="admin-input" required min="0" placeholder="0.00">
+            </div>
+            
+            <div class="admin-form-group">
+              <label for="editUserDeposits">Total Deposits ($)</label>
+              <input type="number" step="any" id="editUserDeposits" class="admin-input" required min="0" placeholder="0.00">
+            </div>
+            
+            <div class="admin-form-group">
+              <label for="editUserWithdrawals">Total Withdrawals ($)</label>
+              <input type="number" step="any" id="editUserWithdrawals" class="admin-input" required min="0" placeholder="0.00">
+            </div>
+            
+            <div class="admin-form-group">
+              <label for="editUserInterest">Total Interest ($)</label>
+              <input type="number" step="any" id="editUserInterest" class="admin-input" required min="0" placeholder="0.00">
+            </div>
+            
+            <div class="admin-form-group">
+              <label for="editUserProfit">Profit ($)</label>
+              <input type="number" step="any" id="editUserProfit" class="admin-input" required placeholder="0.00">
+            </div>
+            
+            <div class="admin-form-group admin-form-group--full" style="display:flex; flex-direction:row; align-items:center; gap:10px; margin-top:10px; padding-top:10px; border-top:1px solid var(--border);">
+              <input type="checkbox" id="editUserSuspended" style="width:20px; height:20px; cursor:pointer; accent-color:var(--accent);">
+              <label for="editUserSuspended" style="font-size:0.9rem; cursor:pointer; color:var(--text-primary); font-weight: 600;">Suspend user account</label>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="admin-modal-footer">
+        <button class="btn" style="background:var(--bg-tertiary); color:var(--text-secondary); border:1px solid var(--border);" onclick="closeUserManagerModal()">Cancel</button>
+        <button class="btn btn--primary" id="saveUserBtn" onclick="saveUserProfile()">Save Changes</button>
+      </div>
     </div>
   </div>
 

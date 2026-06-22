@@ -420,6 +420,79 @@ runSafe(() => {
 });
 
 // --- Native Dashboard SDK Performance Processing Engine ---
+// Helper to update the dashboard UI with a profile record
+function updateDashboardUI(profile, email) {
+  if (!profile) return;
+  
+  const profileName = profile.name || email.split('@')[0];
+  const initials = profileName.slice(0, 2).toUpperCase();
+  
+  const avatar = document.getElementById('userAvatar');
+  const userName = document.getElementById('userName');
+  const userEmailEl = document.getElementById('userEmail');
+  const userEmailDisplay = document.getElementById('userEmailDisplay');
+  const settingsEmailField = document.getElementById('settingsEmailField');
+  
+  const balance = document.getElementById('accountBalance');
+  const tier = document.getElementById('tierPlan');
+  const deposits = document.getElementById('totalDeposit');
+  const withdrawals = document.getElementById('totalWithdrawals');
+  
+  const internetWallet = document.getElementById('internetWallet') || document.getElementById('interestWallet');
+  const totalInterest = document.getElementById('totalInterest');
+  const totalProfit = document.getElementById('totalProfit');
+  
+  if (avatar) avatar.textContent = initials;
+  if (userEmailEl) userEmailEl.textContent = email;
+  if (userEmailDisplay) userEmailDisplay.textContent = email;
+  if (settingsEmailField) settingsEmailField.value = email;
+  
+  if (userName) {
+    userName.textContent = profileName;
+  }
+
+  if (tier) {
+    tier.textContent = (profile.tier || 'Starter').toUpperCase();
+  }
+
+  if (balance) {
+    balance.textContent =
+      '$' + parseFloat(profile.balance || 0)
+      .toLocaleString('en-US', { minimumFractionDigits: 2 });
+  }
+
+  if (deposits) {
+    deposits.textContent =
+      '$' + parseFloat(profile.total_deposits || 0)
+      .toLocaleString('en-US', { minimumFractionDigits: 2 });
+  }
+
+  if (withdrawals) {
+    withdrawals.textContent =
+      '$' + parseFloat(profile.total_withdrawals || 0)
+      .toLocaleString('en-US', { minimumFractionDigits: 2 });
+  }
+
+  if (internetWallet) {
+    internetWallet.textContent =
+      '$' + parseFloat(profile.internet_wallet || 0)
+      .toLocaleString('en-US', { minimumFractionDigits: 2 });
+  }
+
+  if (totalInterest) {
+    totalInterest.textContent =
+      '$' + parseFloat(profile.total_interest || 0)
+      .toLocaleString('en-US', { minimumFractionDigits: 2 });
+  }
+
+  if (totalProfit) {
+    totalProfit.textContent =
+      '$' + parseFloat(profile.profit || 0)
+      .toLocaleString('en-US', { minimumFractionDigits: 2 });
+  }
+}
+
+// --- Native Dashboard SDK Performance Processing Engine ---
 async function loadDashboardData() {
   console.log("loadDashboardData started");
   const client = getSupabase();
@@ -440,18 +513,6 @@ async function loadDashboardData() {
 
   try {
     const profileName = user.user_metadata?.name || user.email.split('@')[0];
-    const initials = profileName.slice(0, 2).toUpperCase();
-    
-    const avatar = document.getElementById('userAvatar');
-    const userName = document.getElementById('userName');
-    const userEmailEl = document.getElementById('userEmail');
-    const userEmailDisplay = document.getElementById('userEmailDisplay');
-    const settingsEmailField = document.getElementById('settingsEmailField');
-    
-    if (avatar) avatar.textContent = initials;
-    if (userEmailEl) userEmailEl.textContent = user.email;
-    if (userEmailDisplay) userEmailDisplay.textContent = user.email;
-    if (settingsEmailField) settingsEmailField.value = user.email;
     
     let { data: profile, error: profError } = await client
       .from('profiles')
@@ -516,45 +577,36 @@ async function loadDashboardData() {
       }
     }
 
-    const balance = document.getElementById('accountBalance');
-    const tier = document.getElementById('tierPlan');
-    const deposits = document.getElementById('totalDeposit');
-    const withdrawals = document.getElementById('totalWithdrawals');
-    const interestWallet = document.getElementById('interestWallet');
+    // Render the initial profile state
+    updateDashboardUI(profile, user.email);
 
-    if (profile) {
-      if (userName) {
-        userName.textContent = profile.name || user.email.split('@')[0];
-      }
-
-      if (tier) {
-        tier.textContent = (profile.tier || 'Starter').toUpperCase();
-      }
-
-      if (balance) {
-        balance.textContent =
-          '$' + parseFloat(profile.balance || 0)
-          .toLocaleString('en-US', { minimumFractionDigits: 2 });
-      }
-
-      if (deposits) {
-        deposits.textContent =
-          '$' + parseFloat(profile.total_deposits || 0)
-          .toLocaleString('en-US', { minimumFractionDigits: 2 });
-      }
-
-      if (withdrawals) {
-        withdrawals.textContent =
-          '$' + parseFloat(profile.total_withdrawals || 0)
-          .toLocaleString('en-US', { minimumFractionDigits: 2 });
-      }
-
-      if (interestWallet) {
-        interestWallet.textContent =
-          '$' + parseFloat(profile.interest_wallet || 0)
-          .toLocaleString('en-US', { minimumFractionDigits: 2 });
-      }
+    // Subscribe to real-time database updates for this user
+    if (window.profileSubscriptionChannel) {
+      client.removeChannel(window.profileSubscriptionChannel);
     }
+    
+    window.profileSubscriptionChannel = client
+      .channel('public:profiles:me')
+      .on('postgres_changes', { 
+        event: 'UPDATE', 
+        schema: 'public', 
+        table: 'profiles', 
+        filter: `id=eq.${user.id}` 
+      }, payload => {
+        console.log('Real-time profile update received:', payload.new);
+        const updatedProfile = payload.new;
+        if (updatedProfile) {
+          if (updatedProfile.status === 'suspended') {
+            alert("Your account has been suspended. Please contact support.");
+            client.auth.signOut().then(() => {
+              window.location.href = 'login.html';
+            });
+            return;
+          }
+          updateDashboardUI(updatedProfile, user.email);
+        }
+      })
+      .subscribe();
     const { data: transactions } = await client
       .from('transactions')
       .select('*')

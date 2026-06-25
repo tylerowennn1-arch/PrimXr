@@ -243,6 +243,37 @@ if (calcBtn && calcAmount && calcPlan) {
   calcPlan.addEventListener('change', calculateReturns);
   calculateReturns();
 }
+// --- Hero Counter Animation ---
+runSafe(() => {
+  const counters = document.querySelectorAll('.hero__stat-value');
+
+  counters.forEach(counter => {
+    const target = parseFloat(counter.dataset.target);
+    const prefix = counter.dataset.prefix || '';
+    const suffix = counter.dataset.suffix || '';
+
+    let current = 0;
+    const increment = target / 120;
+
+    function updateCounter() {
+      current += increment;
+
+      if (current >= target) {
+        counter.textContent = prefix + target + suffix;
+        return;
+      }
+
+      counter.textContent =
+        prefix +
+        (target % 1 ? current.toFixed(1) : Math.floor(current)) +
+        suffix;
+
+      requestAnimationFrame(updateCounter);
+    }
+
+    updateCounter();
+  });
+});
 
 // --- Native Supabase Registration System ---
 runSafe(() => {
